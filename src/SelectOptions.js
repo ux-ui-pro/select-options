@@ -1,46 +1,50 @@
 class SelectOptions {
   constructor() {
-
+    this.openSelect = null;
   }
 
-  init() {
-    const selectElements = document.querySelectorAll('.select-option-container select[name="select"]');
+  #setupCustomSelect(selectElement, customSelect) {
+    let selectTrigger = customSelect.querySelector('.select-option-trigger');
+    let selectItems = customSelect.querySelector('.select-option-items');
 
-    selectElements.forEach(selectElement => {
-      const customSelect = this.#createCustomSelect(selectElement);
+    if (!selectTrigger) {
+      selectTrigger = document.createElement('div');
 
-      selectElement.style.display = 'none';
-      selectElement.parentNode.insertBefore(customSelect, selectElement.nextSibling);
-    });
+      selectTrigger.classList.add('select-option-trigger');
 
-    document.addEventListener('click', this.#closeOpenDropdowns);
-  }
+      customSelect.appendChild(selectTrigger);
+    }
 
-  #createCustomSelect(selectElement) {
-    const customSelect = document.createElement('div');
+    if (!selectItems) {
+      selectItems = document.createElement('div');
 
-    customSelect.classList.add('select-option');
+      selectItems.classList.add('select-option-items');
 
-    const selectTrigger = document.createElement('div');
-
-    selectTrigger.classList.add('select-option-trigger');
-    customSelect.appendChild(selectTrigger);
-
-    const selectItems = document.createElement('div');
-
-    selectItems.classList.add('select-option-items');
-    customSelect.appendChild(selectItems);
+      customSelect.appendChild(selectItems);
+    }
 
     this.#createOptions(selectElement, selectTrigger, selectItems);
 
-    selectTrigger.addEventListener('click', () => {
-      customSelect.classList.toggle('select-option--open');
-    });
+    selectTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
 
-    return customSelect;
+      if (this.openSelect === customSelect) {
+        customSelect.classList.remove('select-option--open');
+
+        this.openSelect = null;
+      } else {
+        this.#closeOpenDropdowns();
+
+        customSelect.classList.add('select-option--open');
+
+        this.openSelect = customSelect;
+      }
+    });
   }
 
   #createOptions(selectElement, selectTrigger, selectItems) {
+    selectItems.innerHTML = '';
+
     const options = selectElement.querySelectorAll('option');
 
     options.forEach((option, index) => {
@@ -80,16 +84,61 @@ class SelectOptions {
     const event = new Event('change');
 
     selectElement.dispatchEvent(event);
-
     selectItem.closest('.select-option').classList.remove('select-option--open');
+
+    this.openSelect = null;
   }
 
   #closeOpenDropdowns(e) {
-    const openDropdown = document.querySelector('.select-option.select-option--open');
+    const openDropdowns = document.querySelectorAll('.select-option.select-option--open');
 
-    if (openDropdown && !openDropdown.contains(e.target)) {
-      openDropdown.classList.remove('select-option--open');
+    openDropdowns.forEach(dropdown => {
+      if (!e || !dropdown.contains(e.target)) {
+        dropdown.classList.remove('select-option--open');
+      }
+    });
+
+    this.openSelect = null;
+  }
+
+  #checkAndSetDownstairsClass(customSelect) {
+    const rect = customSelect.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+
+    if (rect.bottom + 230 > viewportHeight) {
+      customSelect.classList.add('select-option--downstairs');
+    } else {
+      customSelect.classList.remove('select-option--downstairs');
     }
+  }
+
+  #handleResize() {
+    const selectElements = document.querySelectorAll('.select-option-container .select-option');
+
+    selectElements.forEach(customSelect => {
+      this.#checkAndSetDownstairsClass(customSelect);
+    });
+  }
+
+  init() {
+    const selectElements = document.querySelectorAll('.select-option-container select[name="select"]');
+
+    selectElements.forEach(selectElement => {
+      const customSelect = selectElement.closest('.select-option-container').querySelector('.select-option');
+
+      if (customSelect) {
+        this.#setupCustomSelect(selectElement, customSelect);
+
+        selectElement.style.display = 'none';
+
+        this.#checkAndSetDownstairsClass(customSelect);
+      }
+    });
+
+    document.addEventListener('click', this.#closeOpenDropdowns.bind(this));
+
+    window.addEventListener('resize', this.#handleResize.bind(this));
+    window.addEventListener('scroll', this.#handleResize.bind(this));
   }
 }
 
