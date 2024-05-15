@@ -1,3 +1,7 @@
+.select-option-container {
+  line-height: 1;
+}
+
 .select-option {
   position: relative;
   display: flex;
@@ -6,7 +10,6 @@
   box-shadow: 0 0 0 1px inset DarkGray;
   cursor: pointer;
   color: SlateGrey;
-  line-height: 1;
   white-space: nowrap;
 
   &--open {
