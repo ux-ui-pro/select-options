@@ -1,6 +1,6 @@
 {
   "name": "select-options",
-  "version": "0.0.1-alpha.2",
+  "version": "0.0.1-alpha.3",
   "description": "The class replaces standard HTML dropdown lists with custom ones, improving their appearance and user interaction.",
   "author": "ux-ui.pro",
   "license": "MIT",
