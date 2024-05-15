@@ -1,0 +1,46 @@
+.select-option {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  cursor: pointer;
+  background-color: white;
+
+  .select-option-trigger {
+    padding: 10px;
+  }
+
+  .select-option-items {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    background-color: white;
+    z-index: 1000;
+
+    .select-option-item {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &--selected {
+        background-color: #007BFF;
+        color: white;
+      }
+    }
+  }
+
+  &--open .select-option-items {
+    display: block;
+  }
+
+  select {
+    display: none;
+  }
+}

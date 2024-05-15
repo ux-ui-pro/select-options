@@ -1,0 +1,50 @@
+{
+  "name": "select-options",
+  "version": "0.0.1-alpha.1",
+  "description": "The class replaces standard HTML dropdown lists with custom ones, improving their appearance and user interaction.",
+  "author": "ux-ui.pro",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ux-ui-pro/select-options.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ux-ui-pro/select-options/issues"
+  },
+  "homepage": "https://github.com/ux-ui-pro/select-options",
+  "sideEffects": false,
+  "css": "dist/select-options.css",
+  "main": "dist/select-options.js",
+  "module": "dist/select-options.module.js",
+  "targets": {
+    "css": {
+      "source": "src/styles/index.scss"
+    },
+    "main": {
+      "source": "src/SelectOptions.js"
+    },
+    "module": {
+      "source": "src/SelectOptions.js"
+    }
+  },
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "scripts": {
+    "clean": "rm -rf dist .parcel-cache",
+    "build": "yarn clean && parcel build",
+    "lint:js": "eslint --ext .js",
+    "lint:scss": "stylelint **/*.scss",
+    "lintfix": "yarn lint:js --fix && yarn lint:scss --fix"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.12.0",
+    "eslint": "^7.32.0 || ^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "parcel": "^2.12.0",
+    "stylelint": "^16.5.0",
+    "stylelint-config-standard-scss": "^13.1.0",
+    "stylelint-selector-bem-pattern": "^4.0.0"
+  },
+  "keywords": [
+    "select"
+  ]
+}
