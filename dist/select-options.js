@@ -52,6 +52,7 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
             if (option.selected) {
                 selectItem.classList.add("select-option-item--selected");
                 selectTrigger.textContent = option.textContent;
+                if (labelValue) selectTrigger.closest(".select-option").classList.add(`select-option--${labelValue}`);
             }
             selectItem.addEventListener("click", ()=>{
                 this.#selectItem(selectItem, selectTrigger, selectElement, index, selectItems);
@@ -60,15 +61,23 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         });
     }
     #selectItem(selectItem, selectTrigger, selectElement, index, selectItems) {
+        const customSelect = selectTrigger.closest(".select-option");
         selectItems.querySelectorAll(".select-option-item").forEach((item)=>{
             item.classList.remove("select-option-item--selected");
         });
         selectItem.classList.add("select-option-item--selected");
         selectTrigger.textContent = selectItem.textContent;
         selectElement.selectedIndex = index;
+        const prevLabelClasses = Array.from([
+            ...customSelect.classList
+        ]).filter((cls)=>cls.startsWith("select-option--") && cls !== "select-option--dense");
+        prevLabelClasses.forEach((cls)=>customSelect.classList.remove(cls));
+        const selectedOption = selectElement.options[index];
+        const labelValue = selectedOption.getAttribute("label");
+        if (labelValue) customSelect.classList.add(`select-option--${labelValue}`);
         const event = new Event("change");
         selectElement.dispatchEvent(event);
-        selectItem.closest(".select-option").classList.remove("select-option--open");
+        customSelect.classList.remove("select-option--open");
         this.openSelect = null;
     }
     #closeOpenDropdowns(e) {

@@ -10,7 +10,7 @@
 </div>
 
 <p align="center">The class replaces standard HTML dropdown lists with custom ones, improving their appearance and user interaction.</p>
-<p align="center"><sup>0.5kB gzipped</sup></p>
+<p align="center"><sup>1kB gzipped</sup></p>
 <p align="center"><a href="https://codepen.io/ux-ui/pen/pomJYYr">Demo</a></p>
 <br>
 

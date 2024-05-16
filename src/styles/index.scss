@@ -43,6 +43,10 @@
     }
   }
 
+  &--dense .select-option-trigger {
+    height: 36px;
+  }
+
   &--open .select-option-trigger {
     &::after {
       transform: rotate(0.5turn);

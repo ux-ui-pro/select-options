@@ -9,17 +9,13 @@ class SelectOptions {
 
     if (!selectTrigger) {
       selectTrigger = document.createElement('div');
-
       selectTrigger.classList.add('select-option-trigger');
-
       customSelect.appendChild(selectTrigger);
     }
 
     if (!selectItems) {
       selectItems = document.createElement('div');
-
       selectItems.classList.add('select-option-items');
-
       customSelect.appendChild(selectItems);
     }
 
@@ -62,6 +58,10 @@ class SelectOptions {
       if (option.selected) {
         selectItem.classList.add('select-option-item--selected');
         selectTrigger.textContent = option.textContent;
+
+        if (labelValue) {
+          selectTrigger.closest('.select-option').classList.add(`select-option--${labelValue}`);
+        }
       }
 
       selectItem.addEventListener('click', () => {
@@ -73,6 +73,8 @@ class SelectOptions {
   }
 
   #selectItem(selectItem, selectTrigger, selectElement, index, selectItems) {
+    const customSelect = selectTrigger.closest('.select-option');
+
     selectItems.querySelectorAll('.select-option-item').forEach(item => {
       item.classList.remove('select-option-item--selected');
     });
@@ -81,10 +83,21 @@ class SelectOptions {
     selectTrigger.textContent = selectItem.textContent;
     selectElement.selectedIndex = index;
 
+    const prevLabelClasses = Array.from([...customSelect.classList]).filter(cls => cls.startsWith('select-option--') && cls !== 'select-option--dense');
+
+    prevLabelClasses.forEach(cls => customSelect.classList.remove(cls));
+
+    const selectedOption = selectElement.options[index];
+    const labelValue = selectedOption.getAttribute('label');
+
+    if (labelValue) {
+      customSelect.classList.add(`select-option--${labelValue}`);
+    }
+
     const event = new Event('change');
 
     selectElement.dispatchEvent(event);
-    selectItem.closest('.select-option').classList.remove('select-option--open');
+    customSelect.classList.remove('select-option--open');
 
     this.openSelect = null;
   }
@@ -128,15 +141,12 @@ class SelectOptions {
 
       if (customSelect) {
         this.#setupCustomSelect(selectElement, customSelect);
-
         selectElement.style.display = 'none';
-
         this.#checkAndSetDownstairsClass(customSelect);
       }
     });
 
     document.addEventListener('click', this.#closeOpenDropdowns.bind(this));
-
     window.addEventListener('resize', this.#handleResize.bind(this));
     window.addEventListener('scroll', this.#handleResize.bind(this));
   }
