@@ -134,7 +134,7 @@ class SelectOptions {
   }
 
   init() {
-    const selectElements = document.querySelectorAll('.select-option-container select[name="select"]');
+    const selectElements = document.querySelectorAll('.select-option-container select');
 
     selectElements.forEach(selectElement => {
       const customSelect = selectElement.closest('.select-option-container').querySelector('.select-option');
