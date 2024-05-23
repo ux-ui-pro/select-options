@@ -11,7 +11,7 @@
 
 <p align="center">The class replaces standard HTML dropdown lists with custom ones, improving their appearance and user interaction.</p>
 <p align="center"><sup>1kB gzipped</sup></p>
-<p align="center"><a href="https://codepen.io/ux-ui/pen/pomJYYr">Demo</a></p>
+<p align="center"><a href="https://codepen.io/ux-ui/full/pomJYYr">Demo</a></p>
 <br>
 
 &#10148; **Install**
@@ -44,6 +44,30 @@ document.addEventListener('DOMContentLoaded', () => {
   selectOptions.init();
 });
 ```
+<br>
+
+&#10148; **CSS custom properties**
+
+| Variable                          |   Default    | Description                                                              |
+|:----------------------------------|:------------:|:-------------------------------------------------------------------------|
+| `--so-color-outline-inactive`     |  `DarkGray`  | Color of the select border when inactive                                 |
+| `--so-color-outline-hover`        | `SlateGrey`  | Color of the select border on hover                                      |
+| `--so-color-outline-opened`       | `DodgerBlue` | Color of the select border when opened                                   |
+| `--so-color-label-inactive`       |    `Gray`    | Color of the label text when the select is inactive                      |
+| `--so-color-label-opened`         | `DodgerBlue` | Color of the label text when the select is opened                        |
+| `--so-color-label-selected`       |  `DarkGray`  | Color of the label text when an option is selected                       |
+| `--so-color-trigger`              |    `Gray`    | Color of the text in the select field (when an option is selected)       |
+| `--so-color-list-item-inactive`   |    `Gray`    | Color of the text for inactive list items                                |
+| `--so-color-list-item-selected`   |   `White`    | Color of the text for selected list items                                |
+| `--so-color-scrollbar-thumb`      |   `Silver`   | Color of the scrollbar thumb in normal state                             |
+| `--so-color-scrollbar-track`      |   `White`    | Color of the scrollbar track                                             |
+| `--so-color-scrollbar-hover`      |    `Gray`    | Color of the scrollbar thumb on hover                                    |
+| `--so-background-list`            |   `White`    | Background color of the options list                                     |
+| `--so-background-option-inactive` |   `White`    | Background color of inactive options                                     |
+| `--so-background-option-hovered`  | `WhiteSmoke` | Background color of options on hover                                     |
+| `--so-background-option-selected` | `DodgerBlue` | Background color of selected options                                     |
+| `--so-border-radius`              |   `5.5px`    | Border radius for the select border and options list                     |
+| `--so-list-shadow`                |   Material   | Shadow for the dropdown menu                                             |
 <br>
 
 &#10148; **License**
