@@ -1,0 +1,16 @@
+.select-option {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0.009375em;
+
+  select {
+    display: none;
+  }
+
+  &--opened {
+    z-index: 2;
+  }
+}

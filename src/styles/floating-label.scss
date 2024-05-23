@@ -1,0 +1,37 @@
+.select-option {
+  .floating-label {
+    position: absolute;
+    inset: 50% auto auto 17px;
+    max-width: calc(100% - 51px);
+    display: block;
+    pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--so-color-label, Gray);
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    transform-origin: left top;
+    transform: translateY(-50%);
+    transition:
+      transform 150ms cubic-bezier(0, 0.202, 0.204, 1),
+      color 150ms cubic-bezier(0, 0.202, 0.204, 1);
+  }
+
+  &.select-option--selected .floating-label {
+    --so-color-label: var(--so-color-label-selected, DarkGray);
+
+    transform: translateY(-30px) scale(.75);
+  }
+
+  &.select-option--opened .floating-label {
+    --so-color-label: var(--so-color-label-opened, DodgerBlue);
+
+    transform: translateY(-30px) scale(.75);
+  }
+
+  &.select-option--opened.select-option--dense .floating-label,
+  &.select-option--selected.select-option--dense .floating-label {
+    transform: translateY(-24px) scale(.75);
+  }
+}

@@ -1,0 +1,22 @@
+.select-option {
+  .select-option-list-item {
+    height: 48px;
+    line-height: 48px;
+    padding-left: 17px;
+    padding-right: 17px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background-color: var(--so-background-option, White);
+    color: var(--so-color-list-item, Gray);
+
+    &--selected {
+      --so-background-option: var(--so-background-option-selected, DodgerBlue);
+      --so-color-list-item: var(--so-color-list-item-selected, White);
+    }
+
+    &:not(&--selected):hover {
+      --so-background-option: var(--so-background-option-hovered, WhiteSmoke);
+    }
+  }
+}

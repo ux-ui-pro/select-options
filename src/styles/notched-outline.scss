@@ -1,0 +1,61 @@
+.select-option {
+  --so-width-outline: 1px;
+
+  &--labeled {
+    .notched-outline {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      grid-template: 1fr / 12px auto 1fr;
+      gap: 0;
+      margin: auto;
+      height: 100%;
+
+      &__leading {
+        box-shadow:
+          inset 0 var(--so-width-outline) 0 0 var(--so-color-outline, DarkGray),
+          inset var(--so-width-outline) 0 0 0 var(--so-color-outline, DarkGray),
+          inset 0 calc(var(--so-width-outline) * -1) 0 0 var(--so-color-outline, DarkGray);
+        border-radius: var(--so-border-radius, 5.5px) 0 0 var(--so-border-radius, 5.5px);
+        transform: translate3d(0, 0, 0);
+      }
+
+      &__notch {
+        box-shadow:
+          inset 0 var(--so-width-outline) 0 0 var(--so-color-outline, DarkGray),
+          inset 0 calc(var(--so-width-outline) * -1) 0 0 var(--so-color-outline, DarkGray);
+      }
+
+      &__trailing {
+        box-shadow:
+          inset 0 var(--so-width-outline) 0 0 var(--so-color-outline, DarkGray),
+          inset calc(var(--so-width-outline) * -1) 0 0 0 var(--so-color-outline, DarkGray),
+          inset 0 calc(var(--so-width-outline) * -1) 0 0 var(--so-color-outline, DarkGray);
+        border-radius: 0 var(--so-border-radius, 5.5px) var(--so-border-radius, 5.5px) 0;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    &.select-option--opened .notched-outline__notch,
+    &.select-option--selected .notched-outline__notch {
+      box-shadow: inset 0 calc(var(--so-width-outline) * -1) 0 0 var(--so-color-outline, DarkGray);
+    }
+  }
+
+  &--unlabeled {
+    box-shadow: inset 0 0 0 var(--so-width-outline) var(--so-color-outline, DarkGray);
+    border-radius: var(--so-border-radius, 5.5px);
+    transform: translate3d(0, 0, 0);
+  }
+
+  &:not(&--opened):hover {
+    --so-color-outline: var(--so-color-outline-hover, SlateGrey);
+  }
+
+  &--opened {
+    --so-color-outline: var(--so-color-outline-opened, DodgerBlue);
+    --so-width-outline: 2px;
+  }
+}

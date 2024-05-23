@@ -30,14 +30,8 @@ import SelectOptions from 'select-options';
 import 'select-options/dist/select-options.css';
 ```
 <sub>if your bundler supports SCSS</sub>
-```CSS
-
+```SCSS
 @import "select-options/src/styles/index.scss";
-```
-<sub>or compiled CSS</sub>
-```CSS
-
-@import "select-options/dist/select-options.css";
 ```
 <br>
 

@@ -1,0 +1,21 @@
+.select-option {
+  &::after {
+    pointer-events: none;
+    display: block;
+    content: '';
+    position: absolute;
+    inset: 0 14px 0 auto;
+    margin: auto;
+    width: 12px;
+    height: 12px;
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAnIGhlaWdodD0nNScgdmlld0JveD0nNyAxMCAxMCA1JyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxwYXRoIGZpbGwtcnVsZT0nZXZlbm9kZCcgb3BhY2l0eT0nLjU0JyBkPSdNNyAxMGw1IDUgNS01eicvPjwvc3ZnPg==)
+    center / 12px 12px
+    no-repeat;
+  }
+
+  &--opened {
+    &::after {
+      transform: rotate(0.5turn);
+    }
+  }
+}
