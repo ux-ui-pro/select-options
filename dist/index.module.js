@@ -1,16 +1,4 @@
-
-function $parcel$defineInteropFlag(a) {
-  Object.defineProperty(a, '__esModule', {value: true, configurable: true});
-}
-
-function $parcel$export(e, n, v, s) {
-  Object.defineProperty(e, n, {get: v, set: s, enumerable: true, configurable: true});
-}
-
-$parcel$defineInteropFlag(module.exports);
-
-$parcel$export(module.exports, "default", function () { return $2cd3d18b6faf2ef8$export$2e2bcd8739ae039; });
-class $2cd3d18b6faf2ef8$var$SelectOptions {
+class $eb1aa2dd460bfb6b$var$SelectOptions {
     #notches = [];
     openSelect = null;
     #resizeObserver = new ResizeObserver((entries)=>entries.forEach((entry)=>{
@@ -129,7 +117,8 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         window.addEventListener("scroll", this.#handleResize);
     };
 }
-var $2cd3d18b6faf2ef8$export$2e2bcd8739ae039 = $2cd3d18b6faf2ef8$var$SelectOptions;
+var $eb1aa2dd460bfb6b$export$2e2bcd8739ae039 = $eb1aa2dd460bfb6b$var$SelectOptions;
 
 
-//# sourceMappingURL=select-options.js.map
+export {$eb1aa2dd460bfb6b$export$2e2bcd8739ae039 as default};
+//# sourceMappingURL=index.module.js.map
