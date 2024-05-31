@@ -13,6 +13,18 @@
     z-index: 1;
     border-radius: 0;
     opacity: 0;
+
+    -webkit-appearance: none;
+    outline: none;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+    background-clip: padding-box;
+
+    &:focus {
+      outline: none;
+      border: none;
+      -webkit-tap-highlight-color: transparent;
+    }
   }
 
   &:not(&--mobile) {

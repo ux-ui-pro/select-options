@@ -1,6 +1,6 @@
 {
   "name": "select-options",
-  "version": "0.0.1-beta.5",
+  "version": "0.0.1-beta.6",
   "description": "SelectOptions replaces standard HTML drop-down lists with custom ones, improving their appearance and user interaction.",
   "author": "ux-ui.pro",
   "license": "MIT",
