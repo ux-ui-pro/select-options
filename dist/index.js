@@ -11,15 +11,23 @@ $parcel$defineInteropFlag(module.exports);
 
 $parcel$export(module.exports, "default", function () { return $2cd3d18b6faf2ef8$export$2e2bcd8739ae039; });
 class $2cd3d18b6faf2ef8$var$SelectOptions {
+    #selectContainer;
+    #floatingLabel;
     #notches = [];
-    openSelect = null;
-    #resizeObserver = new ResizeObserver((entries)=>entries.forEach((entry)=>{
-            const notch = entry.target.closest(".notched-outline")?.querySelector(".notched-outline__notch");
-            if (notch) this.#setNotchWidth(notch, this.#getNotchWidth(notch));
-        }));
+    #customSelects = [];
+    #openSelect = null;
+    #resizeObserver;
+    constructor(){
+        this.#selectContainer = Array.from(document.querySelectorAll(".select-option-container select"));
+        this.#floatingLabel = Array.from(document.querySelectorAll(".floating-label"));
+        this.#resizeObserver = new ResizeObserver((entries)=>entries.forEach((entry)=>{
+                const notch = entry.target.closest(".notched-outline")?.querySelector(".notched-outline__notch");
+                if (notch) this.#setNotchWidth(notch, this.#getNotchWidth(notch));
+            }));
+    }
     #notched = ()=>{
-        document.querySelectorAll(".floating-label").forEach((label)=>{
-            let notchedOutline = label.closest(".notched-outline") ?? document.createElement("div");
+        this.#floatingLabel.forEach((label)=>{
+            const notchedOutline = label.closest(".notched-outline") ?? document.createElement("div");
             if (!notchedOutline.classList.contains("notched-outline")) {
                 notchedOutline.classList.add("notched-outline");
                 notchedOutline.innerHTML = `
@@ -43,26 +51,27 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         const label = notch.querySelector(".floating-label");
         return label ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px` : "auto";
     };
-    #setupCustomSelect = (selectElement, customSelect)=>{
+    #setupCustomSelect = (selectElement, customSelect, options)=>{
         const selectTrigger = customSelect.querySelector(".select-option-trigger") ?? document.createElement("div");
         const selectItems = customSelect.querySelector(".select-option-list") ?? document.createElement("div");
         selectTrigger.classList.add("select-option-trigger");
         selectItems.classList.add("select-option-list");
         if (!customSelect.contains(selectTrigger)) customSelect.appendChild(selectTrigger);
         if (!customSelect.contains(selectItems)) customSelect.appendChild(selectItems);
-        this.#createOptions(selectElement, selectTrigger, selectItems);
+        this.#createOptions(selectElement, selectTrigger, selectItems, options);
         selectTrigger.addEventListener("click", (e)=>{
             e.stopPropagation();
-            this.openSelect === customSelect ? this.#closeDropdown(customSelect) : this.#openDropdown(customSelect);
+            this.#openSelect === customSelect ? this.#closeDropdown(customSelect) : this.#openDropdown(customSelect);
         });
         const hasLabel = customSelect.querySelector("label.floating-label") !== null;
         customSelect.classList.toggle("select-option--labeled", hasLabel);
         customSelect.classList.toggle("select-option--unlabeled", !hasLabel);
         customSelect.classList.toggle("select-option--selected", hasLabel && selectElement.selectedIndex > 0);
+        this.#customSelects.push(customSelect);
     };
-    #createOptions = (selectElement, selectTrigger, selectItems)=>{
+    #createOptions = (selectElement, selectTrigger, selectItems, options)=>{
         selectItems.innerHTML = "";
-        selectElement.querySelectorAll("option").forEach((option, index)=>{
+        options.forEach((option, index)=>{
             const selectItem = document.createElement("div");
             selectItem.classList.add("select-option-list-item");
             selectItem.textContent = option.textContent;
@@ -79,7 +88,8 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
     };
     #selectItem = (selectItem, selectTrigger, selectElement, index, selectItems)=>{
         const customSelect = selectTrigger.closest(".select-option");
-        selectItems.querySelectorAll(".select-option-list-item").forEach((item)=>item.classList.remove("select-option-list-item--selected"));
+        const items = Array.from(selectItems.children);
+        items.forEach((item)=>item.classList.remove("select-option-list-item--selected"));
         selectItem.classList.add("select-option-list-item--selected");
         selectTrigger.textContent = selectItem.textContent;
         selectElement.selectedIndex = index;
@@ -90,36 +100,40 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         customSelect.classList.toggle("select-option--selected", index > 0);
         selectElement.dispatchEvent(new Event("change"));
         customSelect.classList.remove("select-option--opened");
-        this.openSelect = null;
+        this.#openSelect = null;
     };
     #closeDropdown = (customSelect)=>{
         customSelect.classList.remove("select-option--opened");
-        this.openSelect = null;
+        this.#openSelect = null;
     };
     #openDropdown = (customSelect)=>{
         this.#closeOpenedDropdowns();
         customSelect.classList.add("select-option--opened");
-        this.openSelect = customSelect;
+        this.#openSelect = customSelect;
     };
     #closeOpenedDropdowns = (e)=>{
-        document.querySelectorAll(".select-option.select-option--opened").forEach((dropdown)=>{
+        this.#customSelects.forEach((dropdown)=>{
             if (!e || !dropdown.contains(e.target)) dropdown.classList.remove("select-option--opened");
         });
-        this.openSelect = null;
+        this.#openSelect = null;
     };
     #checkAndSetDownstairsClass = (customSelect)=>{
         const rect = customSelect.getBoundingClientRect();
         customSelect.classList.toggle("select-option--downstairs", rect.bottom + 160 > window.innerHeight);
     };
     #handleResize = ()=>{
-        document.querySelectorAll(".select-option-container .select-option").forEach(this.#checkAndSetDownstairsClass);
+        this.#customSelects.forEach((customSelect)=>{
+            this.#checkAndSetDownstairsClass(customSelect);
+        });
     };
     init = async ()=>{
         await this.#notched();
-        document.querySelectorAll(".select-option-container select").forEach((selectElement)=>{
+        const selectElements = this.#selectContainer;
+        selectElements.forEach((selectElement)=>{
             const customSelect = selectElement.closest(".select-option-container")?.querySelector(".select-option");
+            const options = Array.from(selectElement.options);
             if (customSelect) {
-                this.#setupCustomSelect(selectElement, customSelect);
+                this.#setupCustomSelect(selectElement, customSelect, options);
                 selectElement.style.display = "none";
                 this.#checkAndSetDownstairsClass(customSelect);
             }
