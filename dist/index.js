@@ -17,7 +17,9 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
     #customSelects = [];
     #openSelect = null;
     #resizeObserver;
-    constructor(){
+    #mobileMode = false;
+    constructor(options = {}){
+        this.#mobileMode = options.mobileMode || false;
         this.#selectContainer = Array.from(document.querySelectorAll(".select-option-container select"));
         this.#floatingLabel = Array.from(document.querySelectorAll(".floating-label"));
         this.#resizeObserver = new ResizeObserver((entries)=>entries.forEach((entry)=>{
@@ -59,7 +61,8 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         if (!customSelect.contains(selectTrigger)) customSelect.appendChild(selectTrigger);
         if (!customSelect.contains(selectItems)) customSelect.appendChild(selectItems);
         this.#createOptions(selectElement, selectTrigger, selectItems, options);
-        selectTrigger.addEventListener("click", (e)=>{
+        // Check if mobileMode is true and the device is mobile
+        if (!(this.#mobileMode && this.#isMobileDevice())) selectTrigger.addEventListener("click", (e)=>{
             e.stopPropagation();
             this.#openSelect === customSelect ? this.#closeDropdown(customSelect) : this.#openDropdown(customSelect);
         });
@@ -68,6 +71,12 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         customSelect.classList.toggle("select-option--unlabeled", !hasLabel);
         customSelect.classList.toggle("select-option--selected", hasLabel && selectElement.selectedIndex > 0);
         this.#customSelects.push(customSelect);
+        // Add event listener for change event
+        selectElement.addEventListener("change", ()=>{
+            this.#updateCustomSelect(selectElement, customSelect, options);
+        });
+        // Add mobile class if necessary
+        if (this.#mobileMode && this.#isMobileDevice()) customSelect.classList.add("select-option--mobile");
     };
     #createOptions = (selectElement, selectTrigger, selectItems, options)=>{
         selectItems.innerHTML = "";
@@ -85,6 +94,18 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
             selectItem.addEventListener("click", ()=>this.#selectItem(selectItem, selectTrigger, selectElement, index, selectItems));
             selectItems.appendChild(selectItem);
         });
+    };
+    #updateCustomSelect = (selectElement, customSelect, options)=>{
+        const selectTrigger = customSelect.querySelector(".select-option-trigger");
+        const selectItems = customSelect.querySelector(".select-option-list");
+        const selectedIndex = selectElement.selectedIndex;
+        const selectedOption = options[selectedIndex];
+        const labelValue = selectedOption.getAttribute("label");
+        selectTrigger.textContent = selectedOption.textContent;
+        selectTrigger.classList.remove(...Array.from(selectTrigger.classList).filter((cls)=>cls.startsWith("select-option-trigger--")));
+        if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
+        customSelect.classList.toggle("select-option--selected", selectedIndex > 0);
+        this.#createOptions(selectElement, selectTrigger, selectItems, options);
     };
     #selectItem = (selectItem, selectTrigger, selectElement, index, selectItems)=>{
         const customSelect = selectTrigger.closest(".select-option");
@@ -126,6 +147,20 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
             this.#checkAndSetDownstairsClass(customSelect);
         });
     };
+    #isMobileOS = ()=>{
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const isAndroid = /android/i.test(userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+        return isAndroid || isIOS;
+    };
+    #isTouchDevice = ()=>{
+        const touchEventSupported = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+        const touchMediaQuery = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+        return touchEventSupported && touchMediaQuery;
+    };
+    #isMobileDevice = ()=>{
+        return this.#isTouchDevice() || this.#isMobileOS();
+    };
     init = async ()=>{
         await this.#notched();
         const selectElements = this.#selectContainer;
@@ -134,7 +169,6 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
             const options = Array.from(selectElement.options);
             if (customSelect) {
                 this.#setupCustomSelect(selectElement, customSelect, options);
-                selectElement.style.display = "none";
                 this.#checkAndSetDownstairsClass(customSelect);
             }
         });

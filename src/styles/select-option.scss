@@ -7,7 +7,18 @@
   letter-spacing: 0.009375em;
 
   select {
-    display: none;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    z-index: 1;
+    border-radius: 0;
+    opacity: 0;
+  }
+
+  &:not(&--mobile) {
+    select {
+      display: none;
+    }
   }
 
   &--opened {
