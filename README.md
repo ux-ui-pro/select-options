@@ -10,7 +10,7 @@
 </div>
 
 <p align="center">SelectOptions replaces standard HTML drop-down lists with custom ones, improving their appearance and user interaction.</p>
-<p align="center"><sup>1.2kB gzipped</sup></p>
+<p align="center"><sup>1.5kB gzipped</sup></p>
 <p align="center"><a href="https://codepen.io/ux-ui/full/pomJYYr">Demo</a></p>
 <br>
 
@@ -48,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 &#10148; **Options**
 
-|    Option    |  Type   | Default | Description                                                                                                                                                                                                                                                                                            |
-|:------------:|:-------:|:-------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mobileMode` | boolean | `false` | When set to true, the mobileMode parameter allows the default behavior of the native select element to be used on mobile devices instead of the custom dropdown functionality. This takes advantage of the native mobile dropdown interfaces, which are typically more user-friendly on touch screens. |
+|    Option    |   Type    | Default | Description                                                                                                                                                                                                                                                                                            |
+|:------------:|:---------:|:-------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mobileMode` | `boolean` | `false` | When set to true, the mobileMode parameter allows the default behavior of the native select element to be used on mobile devices instead of the custom dropdown functionality. This takes advantage of the native mobile dropdown interfaces, which are typically more user-friendly on touch screens. |
 <br>
 
 &#10148; **CSS custom properties**

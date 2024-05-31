@@ -22,25 +22,26 @@ class SelectOptions {
       entries.forEach((entry) => {
         const notch = entry.target.closest('.notched-outline')?.querySelector('.notched-outline__notch');
 
-        if (notch) this.#setNotchWidth(notch, this.#getNotchWidth(notch));
+        if (notch) SelectOptions.#setNotchWidth(notch, SelectOptions.#getNotchWidth(notch));
       });
     });
   }
 
-  #notched = () => {
+  #notched() {
     this.#floatingLabel.forEach((label) => {
-      const notchedOutline = label.closest('.notched-outline') ?? this.#createNotchedOutline(label);
+      const notchedOutline = label.closest('.notched-outline') ?? SelectOptions.#createNotchedOutline(label);
 
       this.#notches.push({ container: notchedOutline.parentNode, notch: notchedOutline.querySelector('.notched-outline__notch') });
 
       const lastNotch = this.#notches.at(-1).notch;
 
-      this.#setNotchWidth(lastNotch, this.#getNotchWidth(lastNotch));
+      SelectOptions.#setNotchWidth(lastNotch, SelectOptions.#getNotchWidth(lastNotch));
+
       this.#resizeObserver.observe(notchedOutline.querySelector('.floating-label'));
     });
-  };
+  }
 
-  #createNotchedOutline(label) {
+  static #createNotchedOutline(label) {
     const notchedOutline = document.createElement('div');
 
     notchedOutline.classList.add('notched-outline');
@@ -54,15 +55,19 @@ class SelectOptions {
     return notchedOutline;
   }
 
-  #setNotchWidth = (notch, width) => notch.style.width = width;
+  static #setNotchWidth(notch, width) {
+    const localNotch = notch;
 
-  #getNotchWidth = (notch) => {
+    localNotch.style.width = width;
+  }
+
+  static #getNotchWidth(notch) {
     const label = notch.querySelector('.floating-label');
 
     return label ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px` : 'auto';
-  };
+  }
 
-  #setupCustomSelect = (selectElement, customSelect, options) => {
+  #setupCustomSelect(selectElement, customSelect, options) {
     const selectTrigger = customSelect.querySelector('.select-option-trigger') ?? document.createElement('div');
     const selectItems = customSelect.querySelector('.select-option-list') ?? document.createElement('div');
 
@@ -73,15 +78,19 @@ class SelectOptions {
 
     this.#createOptions(selectElement, selectTrigger, selectItems, options);
 
-    if (!(this.#mobileMode && this.#isMobileDevice())) {
+    if (!(this.#mobileMode && SelectOptions.#isMobileDevice())) {
       selectTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
 
-        this.#openSelect === customSelect ? this.#closeDropdown(customSelect) : this.#openDropdown(customSelect);
+        if (this.#openSelect === customSelect) {
+          this.#closeDropdown(customSelect);
+        } else {
+          this.#openDropdown(customSelect);
+        }
       });
     }
 
-    this.#updateCustomSelectState(customSelect, selectElement);
+    SelectOptions.#updateCustomSelectState(customSelect, selectElement);
 
     this.#customSelects.push(customSelect);
 
@@ -89,13 +98,16 @@ class SelectOptions {
       this.#updateCustomSelect(selectElement, customSelect, options);
     });
 
-    if (this.#mobileMode && this.#isMobileDevice()) {
+    if (this.#mobileMode && SelectOptions.#isMobileDevice()) {
       customSelect.classList.add('select-option--mobile');
     }
-  };
+  }
 
-  #createOptions = (selectElement, selectTrigger, selectItems, options) => {
-    selectItems.innerHTML = '';
+  #createOptions(selectElement, selectTrigger, selectItems, options) {
+    const trigger = selectTrigger;
+    const items = selectItems;
+
+    items.innerHTML = '';
 
     options.forEach((option, index) => {
       const selectItem = document.createElement('div');
@@ -109,107 +121,117 @@ class SelectOptions {
 
       if (option.selected) {
         selectItem.classList.add('select-option-list-item--selected');
-        selectTrigger.textContent = option.textContent;
+        trigger.textContent = option.textContent;
 
-        if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
+        if (labelValue) trigger.classList.add(`select-option-trigger--${labelValue}`);
       }
 
-      selectItem.addEventListener('click', () => this.#selectItem(selectItem, selectTrigger, selectElement, index, selectItems));
-      selectItems.appendChild(selectItem);
+      selectItem.addEventListener('click', () => this.#selectItem(selectItem, trigger, selectElement, index, items));
+      items.appendChild(selectItem);
     });
-  };
+  }
 
-  #updateCustomSelect = (selectElement, customSelect, options) => {
+  #updateCustomSelect(selectElement, customSelect, options) {
     const selectTrigger = customSelect.querySelector('.select-option-trigger');
     const selectItems = customSelect.querySelector('.select-option-list');
     const { selectedIndex } = selectElement;
     const selectedOption = options[selectedIndex];
     const labelValue = selectedOption.getAttribute('label');
+    const trigger = selectTrigger;
 
-    selectTrigger.textContent = selectedOption.textContent;
-    selectTrigger.classList.remove(...Array.from(selectTrigger.classList).filter((cls) => cls.startsWith('select-option-trigger--')));
+    trigger.textContent = selectedOption.textContent;
+    trigger.classList.remove(...Array.from(trigger.classList).filter((cls) => cls.startsWith('select-option-trigger--')));
 
     if (labelValue) {
-      selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
+      trigger.classList.add(`select-option-trigger--${labelValue}`);
     }
 
     customSelect.classList.toggle('select-option--selected', selectedIndex > 0);
 
-    this.#createOptions(selectElement, selectTrigger, selectItems, options);
-  };
+    this.#createOptions(selectElement, trigger, selectItems, options);
+  }
 
-  #selectItem = (selectItem, selectTrigger, selectElement, index, selectItems) => {
+  #selectItem(selectItem, selectTrigger, selectElement, index, selectItems) {
     const customSelect = selectTrigger.closest('.select-option');
     const items = Array.from(selectItems.children);
 
     items.forEach((item) => item.classList.remove('select-option-list-item--selected'));
     selectItem.classList.add('select-option-list-item--selected');
 
-    selectTrigger.textContent = selectItem.textContent;
-    selectElement.selectedIndex = index;
+    const updatedSelectTrigger = selectTrigger;
+    const updatedSelectElement = selectElement;
 
-    selectTrigger.classList.remove(...Array.from(selectTrigger.classList).filter((cls) => cls.startsWith('select-option-trigger--')));
+    updatedSelectTrigger.textContent = selectItem.textContent;
+    updatedSelectElement.selectedIndex = index;
 
-    const selectedOption = selectElement.options[index];
+    updatedSelectTrigger.classList.remove(...Array.from(updatedSelectTrigger.classList).filter((cls) => cls.startsWith('select-option-trigger--')));
+
+    const selectedOption = updatedSelectElement.options[index];
     const labelValue = selectedOption.getAttribute('label');
 
-    if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
+    if (labelValue) updatedSelectTrigger.classList.add(`select-option-trigger--${labelValue}`);
 
     customSelect.classList.toggle('select-option--selected', index > 0);
-    selectElement.dispatchEvent(new Event('change'));
+    updatedSelectElement.dispatchEvent(new Event('change'));
 
     this.#closeDropdown(customSelect);
-  };
+  }
 
-  #closeDropdown = (customSelect) => {
+  #closeDropdown(customSelect) {
     customSelect.classList.remove('select-option--opened');
 
     this.#openSelect = null;
-  };
+  }
 
-  #openDropdown = (customSelect) => {
+  #openDropdown(customSelect) {
     this.#closeOpenedDropdowns();
 
     customSelect.classList.add('select-option--opened');
 
     this.#openSelect = customSelect;
-  };
+  }
 
-  #closeOpenedDropdowns = (e) => {
+  #closeOpenedDropdowns(e) {
     this.#customSelects.forEach((dropdown) => {
       if (!e || !dropdown.contains(e.target)) dropdown.classList.remove('select-option--opened');
     });
 
     this.#openSelect = null;
-  };
+  }
 
-  #checkAndSetDownstairsClass = (customSelect) => {
+  static #checkAndSetDownstairsClass(customSelect) {
     const rect = customSelect.getBoundingClientRect();
 
     customSelect.classList.toggle('select-option--downstairs', rect.bottom + 160 > window.innerHeight);
-  };
+  }
 
-  #handleResize = () => {
-    this.#customSelects.forEach(this.#checkAndSetDownstairsClass);
-  };
+  #handleResize() {
+    this.#customSelects.forEach(SelectOptions.#checkAndSetDownstairsClass);
+  }
 
-  #isMobileOS = () => /android/i.test(navigator.userAgent || navigator.vendor || window.opera)
-    || /iPad|iPhone|iPod/.test(navigator.userAgent || navigator.vendor || window.opera) && !window.MSStream;
+  static #isMobileOS() {
+    return (/android/i.test(navigator.userAgent || navigator.vendor))
+      || ((/iPad|iPhone|iPod/.test(navigator.userAgent || navigator.vendor)) && !('MSStream' in window));
+  }
 
-  #isTouchDevice = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0
-    || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  static #isTouchDevice() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  }
 
-  #isMobileDevice = () => this.#isTouchDevice() || this.#isMobileOS();
+  static #isMobileDevice() {
+    return SelectOptions.#isTouchDevice() || SelectOptions.#isMobileOS();
+  }
 
-  #updateCustomSelectState = (customSelect, selectElement) => {
+  static #updateCustomSelectState(customSelect, selectElement) {
     const hasLabel = customSelect.querySelector('label.floating-label') !== null;
 
     customSelect.classList.toggle('select-option--labeled', hasLabel);
     customSelect.classList.toggle('select-option--unlabeled', !hasLabel);
     customSelect.classList.toggle('select-option--selected', hasLabel && selectElement.selectedIndex > 0);
-  };
+  }
 
-  init = async () => {
+  async init() {
     this.#notched();
 
     this.#selectContainer.forEach((selectElement) => {
@@ -218,14 +240,15 @@ class SelectOptions {
 
       if (customSelect) {
         this.#setupCustomSelect(selectElement, customSelect, options);
-        this.#checkAndSetDownstairsClass(customSelect);
+
+        SelectOptions.#checkAndSetDownstairsClass(customSelect);
       }
     });
 
-    document.addEventListener('click', this.#closeOpenedDropdowns);
-    window.addEventListener('resize', this.#handleResize);
-    window.addEventListener('scroll', this.#handleResize);
-  };
+    document.addEventListener('click', this.#closeOpenedDropdowns.bind(this));
+    window.addEventListener('resize', this.#handleResize.bind(this));
+    window.addEventListener('scroll', this.#handleResize.bind(this));
+  }
 }
 
 export default SelectOptions;
