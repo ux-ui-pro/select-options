@@ -54,8 +54,8 @@
     --so-color-outline: var(--so-color-outline-hover, SlateGrey);
 
     &.select-option--mobile {
-      --so-color-outline: Green;
-      --so-width-outline: 4px;
+      --so-color-outline: var(--so-color-outline-opened, DodgerBlue);
+      --so-width-outline: 2px;
     }
   }
 

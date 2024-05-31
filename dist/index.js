@@ -18,27 +18,24 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
     #openSelect = null;
     #resizeObserver;
     #mobileMode = false;
-    constructor(options = {}){
-        this.#mobileMode = options.mobileMode || false;
-        this.#selectContainer = Array.from(document.querySelectorAll(".select-option-container select"));
-        this.#floatingLabel = Array.from(document.querySelectorAll(".floating-label"));
-        this.#resizeObserver = new ResizeObserver((entries)=>entries.forEach((entry)=>{
+    constructor({ mobileMode: mobileMode = false } = {}){
+        this.#mobileMode = mobileMode;
+        this.#selectContainer = [
+            ...document.querySelectorAll(".select-option-container select")
+        ];
+        this.#floatingLabel = [
+            ...document.querySelectorAll(".floating-label")
+        ];
+        this.#resizeObserver = new ResizeObserver((entries)=>{
+            entries.forEach((entry)=>{
                 const notch = entry.target.closest(".notched-outline")?.querySelector(".notched-outline__notch");
                 if (notch) this.#setNotchWidth(notch, this.#getNotchWidth(notch));
-            }));
+            });
+        });
     }
     #notched = ()=>{
         this.#floatingLabel.forEach((label)=>{
-            const notchedOutline = label.closest(".notched-outline") ?? document.createElement("div");
-            if (!notchedOutline.classList.contains("notched-outline")) {
-                notchedOutline.classList.add("notched-outline");
-                notchedOutline.innerHTML = `
-          <div class="notched-outline__leading"></div>
-          <div class="notched-outline__notch">${label.outerHTML}</div>
-          <div class="notched-outline__trailing"></div>
-        `;
-                label.replaceWith(notchedOutline);
-            }
+            const notchedOutline = label.closest(".notched-outline") ?? this.#createNotchedOutline(label);
             this.#notches.push({
                 container: notchedOutline.parentNode,
                 notch: notchedOutline.querySelector(".notched-outline__notch")
@@ -48,6 +45,17 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
             this.#resizeObserver.observe(notchedOutline.querySelector(".floating-label"));
         });
     };
+    #createNotchedOutline(label) {
+        const notchedOutline = document.createElement("div");
+        notchedOutline.classList.add("notched-outline");
+        notchedOutline.innerHTML = `
+      <div class="notched-outline__leading"></div>
+      <div class="notched-outline__notch">${label.outerHTML}</div>
+      <div class="notched-outline__trailing"></div>
+    `;
+        label.replaceWith(notchedOutline);
+        return notchedOutline;
+    }
     #setNotchWidth = (notch, width)=>notch.style.width = width;
     #getNotchWidth = (notch)=>{
         const label = notch.querySelector(".floating-label");
@@ -58,24 +66,17 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         const selectItems = customSelect.querySelector(".select-option-list") ?? document.createElement("div");
         selectTrigger.classList.add("select-option-trigger");
         selectItems.classList.add("select-option-list");
-        if (!customSelect.contains(selectTrigger)) customSelect.appendChild(selectTrigger);
-        if (!customSelect.contains(selectItems)) customSelect.appendChild(selectItems);
+        customSelect.append(selectTrigger, selectItems);
         this.#createOptions(selectElement, selectTrigger, selectItems, options);
-        // Check if mobileMode is true and the device is mobile
         if (!(this.#mobileMode && this.#isMobileDevice())) selectTrigger.addEventListener("click", (e)=>{
             e.stopPropagation();
             this.#openSelect === customSelect ? this.#closeDropdown(customSelect) : this.#openDropdown(customSelect);
         });
-        const hasLabel = customSelect.querySelector("label.floating-label") !== null;
-        customSelect.classList.toggle("select-option--labeled", hasLabel);
-        customSelect.classList.toggle("select-option--unlabeled", !hasLabel);
-        customSelect.classList.toggle("select-option--selected", hasLabel && selectElement.selectedIndex > 0);
+        this.#updateCustomSelectState(customSelect, selectElement);
         this.#customSelects.push(customSelect);
-        // Add event listener for change event
         selectElement.addEventListener("change", ()=>{
             this.#updateCustomSelect(selectElement, customSelect, options);
         });
-        // Add mobile class if necessary
         if (this.#mobileMode && this.#isMobileDevice()) customSelect.classList.add("select-option--mobile");
     };
     #createOptions = (selectElement, selectTrigger, selectItems, options)=>{
@@ -98,7 +99,7 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
     #updateCustomSelect = (selectElement, customSelect, options)=>{
         const selectTrigger = customSelect.querySelector(".select-option-trigger");
         const selectItems = customSelect.querySelector(".select-option-list");
-        const selectedIndex = selectElement.selectedIndex;
+        const { selectedIndex: selectedIndex } = selectElement;
         const selectedOption = options[selectedIndex];
         const labelValue = selectedOption.getAttribute("label");
         selectTrigger.textContent = selectedOption.textContent;
@@ -120,8 +121,7 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
         customSelect.classList.toggle("select-option--selected", index > 0);
         selectElement.dispatchEvent(new Event("change"));
-        customSelect.classList.remove("select-option--opened");
-        this.#openSelect = null;
+        this.#closeDropdown(customSelect);
     };
     #closeDropdown = (customSelect)=>{
         customSelect.classList.remove("select-option--opened");
@@ -143,30 +143,24 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         customSelect.classList.toggle("select-option--downstairs", rect.bottom + 160 > window.innerHeight);
     };
     #handleResize = ()=>{
-        this.#customSelects.forEach((customSelect)=>{
-            this.#checkAndSetDownstairsClass(customSelect);
-        });
+        this.#customSelects.forEach(this.#checkAndSetDownstairsClass);
     };
-    #isMobileOS = ()=>{
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        const isAndroid = /android/i.test(userAgent);
-        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-        return isAndroid || isIOS;
-    };
-    #isTouchDevice = ()=>{
-        const touchEventSupported = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-        const touchMediaQuery = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-        return touchEventSupported && touchMediaQuery;
-    };
-    #isMobileDevice = ()=>{
-        return this.#isTouchDevice() || this.#isMobileOS();
+    #isMobileOS = ()=>/android/i.test(navigator.userAgent || navigator.vendor || window.opera) || /iPad|iPhone|iPod/.test(navigator.userAgent || navigator.vendor || window.opera) && !window.MSStream;
+    #isTouchDevice = ()=>"ontouchstart" in window || navigator.maxTouchPoints > 0 || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    #isMobileDevice = ()=>this.#isTouchDevice() || this.#isMobileOS();
+    #updateCustomSelectState = (customSelect, selectElement)=>{
+        const hasLabel = customSelect.querySelector("label.floating-label") !== null;
+        customSelect.classList.toggle("select-option--labeled", hasLabel);
+        customSelect.classList.toggle("select-option--unlabeled", !hasLabel);
+        customSelect.classList.toggle("select-option--selected", hasLabel && selectElement.selectedIndex > 0);
     };
     init = async ()=>{
-        await this.#notched();
-        const selectElements = this.#selectContainer;
-        selectElements.forEach((selectElement)=>{
+        this.#notched();
+        this.#selectContainer.forEach((selectElement)=>{
             const customSelect = selectElement.closest(".select-option-container")?.querySelector(".select-option");
-            const options = Array.from(selectElement.options);
+            const options = [
+                ...selectElement.options
+            ];
             if (customSelect) {
                 this.#setupCustomSelect(selectElement, customSelect, options);
                 this.#checkAndSetDownstairsClass(customSelect);
