@@ -15,6 +15,7 @@ class SelectOptions {
     this.resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
         const notch = entry.target.closest('.notched-outline')?.querySelector('.notched-outline__notch') as HTMLElement | null;
+
         if (notch) SelectOptions.setNotchWidth(notch, SelectOptions.getNotchWidth(notch));
       });
     });
@@ -23,11 +24,14 @@ class SelectOptions {
   private notched() {
     this.floatingLabel.forEach((label) => {
       const notchedOutline = label.closest('.notched-outline') ?? SelectOptions.createNotchedOutline(label);
+
       this.notches.push({ container: notchedOutline.parentNode as HTMLElement, notch: notchedOutline.querySelector('.notched-outline__notch')! });
 
       const lastNotch = this.notches.at(-1)?.notch as HTMLElement | null;
+
       if (lastNotch) {
         SelectOptions.setNotchWidth(lastNotch, SelectOptions.getNotchWidth(lastNotch));
+
         this.resizeObserver.observe(notchedOutline.querySelector('.floating-label') as HTMLElement);
       }
     });
@@ -35,6 +39,7 @@ class SelectOptions {
 
   private static createNotchedOutline(label: HTMLElement): HTMLElement {
     const notchedOutline = document.createElement('div');
+
     notchedOutline.classList.add('notched-outline');
     notchedOutline.innerHTML = `
       <div class="notched-outline__leading"></div>
@@ -42,6 +47,7 @@ class SelectOptions {
       <div class="notched-outline__trailing"></div>
     `;
     label.replaceWith(notchedOutline);
+
     return notchedOutline;
   }
 
@@ -51,6 +57,7 @@ class SelectOptions {
 
   private static getNotchWidth(notch: HTMLElement): string {
     const label = notch.querySelector('.floating-label') as HTMLElement;
+
     return label ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px` : 'auto';
   }
 
@@ -67,6 +74,7 @@ class SelectOptions {
     if (!(this.mobileMode && SelectOptions.isMobileDevice())) {
       selectTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
+
         if (this.openSelect === customSelect) {
           this.closeDropdown(customSelect);
         } else {
@@ -92,15 +100,18 @@ class SelectOptions {
 
     options.forEach((option, index) => {
       const selectItem = document.createElement('div');
+
       selectItem.classList.add('select-option-list-item');
       selectItem.textContent = option.textContent;
 
       const labelValue = option.getAttribute('label');
+
       if (labelValue) selectItem.classList.add(`select-option-list-item--${labelValue}`);
 
       if (option.selected) {
         selectItem.classList.add('select-option-list-item--selected');
         selectTrigger.textContent = option.textContent;
+
         if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
       }
 
@@ -124,6 +135,7 @@ class SelectOptions {
     }
 
     customSelect.classList.toggle('select-option--selected', selectedIndex > 0);
+
     this.createOptions(selectElement, selectTrigger, selectItems, options);
   }
 
@@ -141,6 +153,7 @@ class SelectOptions {
 
     const selectedOption = selectElement.options[index];
     const labelValue = selectedOption.getAttribute('label');
+
     if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
 
     customSelect.classList.toggle('select-option--selected', index > 0);
@@ -151,12 +164,15 @@ class SelectOptions {
 
   private closeDropdown(customSelect: HTMLElement) {
     customSelect.classList.remove('select-option--opened');
+
     this.openSelect = null;
   }
 
   private openDropdown(customSelect: HTMLElement) {
     this.closeOpenedDropdowns();
+
     customSelect.classList.add('select-option--opened');
+
     this.openSelect = customSelect;
   }
 
@@ -164,11 +180,13 @@ class SelectOptions {
     this.customSelects.forEach((dropdown) => {
       if (!e || !dropdown.contains(e.target as Node)) dropdown.classList.remove('select-option--opened');
     });
+
     this.openSelect = null;
   }
 
   private static checkAndSetDownstairsClass(customSelect: HTMLElement) {
     const rect = customSelect.getBoundingClientRect();
+
     customSelect.classList.toggle('select-option--downstairs', rect.bottom + 160 > window.innerHeight);
   }
 
@@ -198,11 +216,14 @@ class SelectOptions {
 
   async init() {
     this.notched();
+
     this.selectContainer.forEach((selectElement) => {
       const customSelect = selectElement.closest('.select-option-container')?.querySelector('.select-option') as HTMLElement;
       const options = Array.from(selectElement.options) as HTMLOptionElement[];
+
       if (customSelect) {
         this.setupCustomSelect(selectElement, customSelect, options);
+
         SelectOptions.checkAndSetDownstairsClass(customSelect);
       }
     });
