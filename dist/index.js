@@ -9,43 +9,41 @@ function $parcel$export(e, n, v, s) {
 
 $parcel$defineInteropFlag(module.exports);
 
-$parcel$export(module.exports, "default", function () { return $2cd3d18b6faf2ef8$export$2e2bcd8739ae039; });
-class $2cd3d18b6faf2ef8$var$SelectOptions {
-    #selectContainer;
-    #floatingLabel;
-    #notches = [];
-    #customSelects = [];
-    #openSelect = null;
-    #resizeObserver;
-    #mobileMode = false;
+$parcel$export(module.exports, "default", function () { return $a196c1ed25598f0e$export$2e2bcd8739ae039; });
+class $a196c1ed25598f0e$var$SelectOptions {
+    selectContainer = [];
+    floatingLabel = [];
+    notches = [];
+    customSelects = [];
+    openSelect = null;
+    resizeObserver;
+    mobileMode = false;
     constructor({ mobileMode: mobileMode = false } = {}){
-        this.#mobileMode = mobileMode;
-        this.#selectContainer = [
-            ...document.querySelectorAll(".select-option-container select")
-        ];
-        this.#floatingLabel = [
-            ...document.querySelectorAll(".floating-label")
-        ];
-        this.#resizeObserver = new ResizeObserver((entries)=>{
+        this.mobileMode = mobileMode;
+        this.selectContainer = Array.from(document.querySelectorAll(".select-option-container select"));
+        this.floatingLabel = Array.from(document.querySelectorAll(".floating-label"));
+        this.resizeObserver = new ResizeObserver((entries)=>{
             entries.forEach((entry)=>{
                 const notch = entry.target.closest(".notched-outline")?.querySelector(".notched-outline__notch");
-                if (notch) $2cd3d18b6faf2ef8$var$SelectOptions.#setNotchWidth(notch, $2cd3d18b6faf2ef8$var$SelectOptions.#getNotchWidth(notch));
+                if (notch) $a196c1ed25598f0e$var$SelectOptions.setNotchWidth(notch, $a196c1ed25598f0e$var$SelectOptions.getNotchWidth(notch));
             });
         });
     }
-    #notched() {
-        this.#floatingLabel.forEach((label)=>{
-            const notchedOutline = label.closest(".notched-outline") ?? $2cd3d18b6faf2ef8$var$SelectOptions.#createNotchedOutline(label);
-            this.#notches.push({
+    notched() {
+        this.floatingLabel.forEach((label)=>{
+            const notchedOutline = label.closest(".notched-outline") ?? $a196c1ed25598f0e$var$SelectOptions.createNotchedOutline(label);
+            this.notches.push({
                 container: notchedOutline.parentNode,
                 notch: notchedOutline.querySelector(".notched-outline__notch")
             });
-            const lastNotch = this.#notches.at(-1).notch;
-            $2cd3d18b6faf2ef8$var$SelectOptions.#setNotchWidth(lastNotch, $2cd3d18b6faf2ef8$var$SelectOptions.#getNotchWidth(lastNotch));
-            this.#resizeObserver.observe(notchedOutline.querySelector(".floating-label"));
+            const lastNotch = this.notches.at(-1)?.notch;
+            if (lastNotch) {
+                $a196c1ed25598f0e$var$SelectOptions.setNotchWidth(lastNotch, $a196c1ed25598f0e$var$SelectOptions.getNotchWidth(lastNotch));
+                this.resizeObserver.observe(notchedOutline.querySelector(".floating-label"));
+            }
         });
     }
-    static #createNotchedOutline(label) {
+    static createNotchedOutline(label) {
         const notchedOutline = document.createElement("div");
         notchedOutline.classList.add("notched-outline");
         notchedOutline.innerHTML = `
@@ -56,37 +54,34 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
         label.replaceWith(notchedOutline);
         return notchedOutline;
     }
-    static #setNotchWidth(notch, width) {
-        const localNotch = notch;
-        localNotch.style.width = width;
+    static setNotchWidth(notch, width) {
+        notch.style.width = width;
     }
-    static #getNotchWidth(notch) {
+    static getNotchWidth(notch) {
         const label = notch.querySelector(".floating-label");
         return label ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px` : "auto";
     }
-    #setupCustomSelect(selectElement, customSelect, options) {
+    setupCustomSelect(selectElement, customSelect, options) {
         const selectTrigger = customSelect.querySelector(".select-option-trigger") ?? document.createElement("div");
         const selectItems = customSelect.querySelector(".select-option-list") ?? document.createElement("div");
         selectTrigger.classList.add("select-option-trigger");
         selectItems.classList.add("select-option-list");
         customSelect.append(selectTrigger, selectItems);
-        this.#createOptions(selectElement, selectTrigger, selectItems, options);
-        if (!(this.#mobileMode && $2cd3d18b6faf2ef8$var$SelectOptions.#isMobileDevice())) selectTrigger.addEventListener("click", (e)=>{
+        this.createOptions(selectElement, selectTrigger, selectItems, options);
+        if (!(this.mobileMode && $a196c1ed25598f0e$var$SelectOptions.isMobileDevice())) selectTrigger.addEventListener("click", (e)=>{
             e.stopPropagation();
-            if (this.#openSelect === customSelect) this.#closeDropdown(customSelect);
-            else this.#openDropdown(customSelect);
+            if (this.openSelect === customSelect) this.closeDropdown(customSelect);
+            else this.openDropdown(customSelect);
         });
-        $2cd3d18b6faf2ef8$var$SelectOptions.#updateCustomSelectState(customSelect, selectElement);
-        this.#customSelects.push(customSelect);
+        $a196c1ed25598f0e$var$SelectOptions.updateCustomSelectState(customSelect, selectElement);
+        this.customSelects.push(customSelect);
         selectElement.addEventListener("change", ()=>{
-            this.#updateCustomSelect(selectElement, customSelect, options);
+            this.updateCustomSelect(selectElement, customSelect, options);
         });
-        if (this.#mobileMode && $2cd3d18b6faf2ef8$var$SelectOptions.#isMobileDevice()) customSelect.classList.add("select-option--mobile");
+        if (this.mobileMode && $a196c1ed25598f0e$var$SelectOptions.isMobileDevice()) customSelect.classList.add("select-option--mobile");
     }
-    #createOptions(selectElement, selectTrigger, selectItems, options) {
-        const trigger = selectTrigger;
-        const items = selectItems;
-        items.innerHTML = "";
+    createOptions(selectElement, selectTrigger, selectItems, options) {
+        selectItems.innerHTML = "";
         options.forEach((option, index)=>{
             const selectItem = document.createElement("div");
             selectItem.classList.add("select-option-list-item");
@@ -95,98 +90,93 @@ class $2cd3d18b6faf2ef8$var$SelectOptions {
             if (labelValue) selectItem.classList.add(`select-option-list-item--${labelValue}`);
             if (option.selected) {
                 selectItem.classList.add("select-option-list-item--selected");
-                trigger.textContent = option.textContent;
-                if (labelValue) trigger.classList.add(`select-option-trigger--${labelValue}`);
+                selectTrigger.textContent = option.textContent;
+                if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
             }
-            selectItem.addEventListener("click", ()=>this.#selectItem(selectItem, trigger, selectElement, index, items));
-            items.appendChild(selectItem);
+            selectItem.addEventListener("click", ()=>this.selectItem(selectItem, selectTrigger, selectElement, index, selectItems));
+            selectItems.appendChild(selectItem);
         });
     }
-    #updateCustomSelect(selectElement, customSelect, options) {
+    updateCustomSelect(selectElement, customSelect, options) {
         const selectTrigger = customSelect.querySelector(".select-option-trigger");
         const selectItems = customSelect.querySelector(".select-option-list");
         const { selectedIndex: selectedIndex } = selectElement;
         const selectedOption = options[selectedIndex];
         const labelValue = selectedOption.getAttribute("label");
-        const trigger = selectTrigger;
-        trigger.textContent = selectedOption.textContent;
-        trigger.classList.remove(...Array.from(trigger.classList).filter((cls)=>cls.startsWith("select-option-trigger--")));
-        if (labelValue) trigger.classList.add(`select-option-trigger--${labelValue}`);
+        selectTrigger.textContent = selectedOption.textContent;
+        selectTrigger.classList.remove(...Array.from(selectTrigger.classList).filter((cls)=>cls.startsWith("select-option-trigger--")));
+        if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
         customSelect.classList.toggle("select-option--selected", selectedIndex > 0);
-        this.#createOptions(selectElement, trigger, selectItems, options);
+        this.createOptions(selectElement, selectTrigger, selectItems, options);
     }
-    #selectItem(selectItem, selectTrigger, selectElement, index, selectItems) {
+    selectItem(selectItem, selectTrigger, selectElement, index, selectItems) {
         const customSelect = selectTrigger.closest(".select-option");
         const items = Array.from(selectItems.children);
         items.forEach((item)=>item.classList.remove("select-option-list-item--selected"));
         selectItem.classList.add("select-option-list-item--selected");
-        const updatedSelectTrigger = selectTrigger;
-        const updatedSelectElement = selectElement;
-        updatedSelectTrigger.textContent = selectItem.textContent;
-        updatedSelectElement.selectedIndex = index;
-        updatedSelectTrigger.classList.remove(...Array.from(updatedSelectTrigger.classList).filter((cls)=>cls.startsWith("select-option-trigger--")));
-        const selectedOption = updatedSelectElement.options[index];
+        selectTrigger.textContent = selectItem.textContent;
+        selectElement.selectedIndex = index;
+        selectTrigger.classList.remove(...Array.from(selectTrigger.classList).filter((cls)=>cls.startsWith("select-option-trigger--")));
+        const selectedOption = selectElement.options[index];
         const labelValue = selectedOption.getAttribute("label");
-        if (labelValue) updatedSelectTrigger.classList.add(`select-option-trigger--${labelValue}`);
+        if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
         customSelect.classList.toggle("select-option--selected", index > 0);
-        updatedSelectElement.dispatchEvent(new Event("change"));
-        this.#closeDropdown(customSelect);
+        selectElement.dispatchEvent(new Event("change"));
+        this.closeDropdown(customSelect);
     }
-    #closeDropdown(customSelect) {
+    closeDropdown(customSelect) {
         customSelect.classList.remove("select-option--opened");
-        this.#openSelect = null;
+        this.openSelect = null;
     }
-    #openDropdown(customSelect) {
-        this.#closeOpenedDropdowns();
+    openDropdown(customSelect) {
+        this.closeOpenedDropdowns();
         customSelect.classList.add("select-option--opened");
-        this.#openSelect = customSelect;
+        this.openSelect = customSelect;
     }
-    #closeOpenedDropdowns(e) {
-        this.#customSelects.forEach((dropdown)=>{
+    closeOpenedDropdowns(e) {
+        this.customSelects.forEach((dropdown)=>{
             if (!e || !dropdown.contains(e.target)) dropdown.classList.remove("select-option--opened");
         });
-        this.#openSelect = null;
+        this.openSelect = null;
     }
-    static #checkAndSetDownstairsClass(customSelect) {
+    static checkAndSetDownstairsClass(customSelect) {
         const rect = customSelect.getBoundingClientRect();
         customSelect.classList.toggle("select-option--downstairs", rect.bottom + 160 > window.innerHeight);
     }
-    #handleResize() {
-        this.#customSelects.forEach($2cd3d18b6faf2ef8$var$SelectOptions.#checkAndSetDownstairsClass);
+    handleResize() {
+        this.customSelects.forEach($a196c1ed25598f0e$var$SelectOptions.checkAndSetDownstairsClass);
     }
-    static #isMobileOS() {
+    static isMobileOS() {
         return /android/i.test(navigator.userAgent || navigator.vendor) || /iPad|iPhone|iPod/.test(navigator.userAgent || navigator.vendor) && !("MSStream" in window);
     }
-    static #isTouchDevice() {
+    static isTouchDevice() {
         return "ontouchstart" in window || navigator.maxTouchPoints > 0 || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     }
-    static #isMobileDevice() {
-        return $2cd3d18b6faf2ef8$var$SelectOptions.#isTouchDevice() || $2cd3d18b6faf2ef8$var$SelectOptions.#isMobileOS();
+    static isMobileDevice() {
+        return $a196c1ed25598f0e$var$SelectOptions.isTouchDevice() || $a196c1ed25598f0e$var$SelectOptions.isMobileOS();
     }
-    static #updateCustomSelectState(customSelect, selectElement) {
+    static updateCustomSelectState(customSelect, selectElement) {
         const hasLabel = customSelect.querySelector("label.floating-label") !== null;
         customSelect.classList.toggle("select-option--labeled", hasLabel);
         customSelect.classList.toggle("select-option--unlabeled", !hasLabel);
         customSelect.classList.toggle("select-option--selected", hasLabel && selectElement.selectedIndex > 0);
     }
     async init() {
-        this.#notched();
-        this.#selectContainer.forEach((selectElement)=>{
+        this.notched();
+        this.selectContainer.forEach((selectElement)=>{
             const customSelect = selectElement.closest(".select-option-container")?.querySelector(".select-option");
-            const options = [
-                ...selectElement.options
-            ];
+            const options = Array.from(selectElement.options);
             if (customSelect) {
-                this.#setupCustomSelect(selectElement, customSelect, options);
-                $2cd3d18b6faf2ef8$var$SelectOptions.#checkAndSetDownstairsClass(customSelect);
+                this.setupCustomSelect(selectElement, customSelect, options);
+                $a196c1ed25598f0e$var$SelectOptions.checkAndSetDownstairsClass(customSelect);
             }
         });
-        document.addEventListener("click", this.#closeOpenedDropdowns.bind(this));
-        window.addEventListener("resize", this.#handleResize.bind(this));
-        window.addEventListener("scroll", this.#handleResize.bind(this));
+        document.addEventListener("click", this.closeOpenedDropdowns.bind(this));
+        window.addEventListener("resize", this.handleResize.bind(this));
+        window.addEventListener("scroll", this.handleResize.bind(this));
     }
 }
-var $2cd3d18b6faf2ef8$export$2e2bcd8739ae039 = $2cd3d18b6faf2ef8$var$SelectOptions;
+var $a196c1ed25598f0e$export$2e2bcd8739ae039 = $a196c1ed25598f0e$var$SelectOptions;
 
 
 //# sourceMappingURL=index.js.map

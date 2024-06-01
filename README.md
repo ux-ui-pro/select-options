@@ -26,12 +26,13 @@ yarn add select-options
 ```javascript
 import SelectOptions from 'select-options';
 ```
-```javascript
-import 'select-options/dist/index.css';
+<sub>CSS</sub>
+```SCSS
+@import "select-options/dist/";
 ```
 <sub>if your bundler supports SCSS</sub>
 ```SCSS
-@import "select-options/src/styles/index.scss";
+@import "select-options/src/";
 ```
 <br>
 
