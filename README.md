@@ -47,6 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
 ```
 <br>
 
+&#10148; **API**
+
+|      Name       |    Type    | Description                                                                                                                                                                                                                                                        |
+|:---------------:|:----------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `updateSelects` | `function` | Updates the state of all custom selects within the `select-option-container`. This method is useful in situations where the original `<select>` elements have been programmatically changed and the custom select UI needs to be updated to reflect these changes. |
+<br>
+
 &#10148; **Options**
 
 |    Option    |   Type    | Default | Description                                                                                                                                                                                                                                                                                            |

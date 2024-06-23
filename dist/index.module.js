@@ -12,8 +12,8 @@ class $643fcf18b2d2e76f$var$SelectOptions {
         this.floatingLabel = Array.from(document.querySelectorAll(".floating-label"));
         this.resizeObserver = new ResizeObserver((entries)=>{
             entries.forEach((entry)=>{
-                const notch = entry.target.closest(".notched-outline")?.querySelector(".notched-outline__notch");
-                if (notch) $643fcf18b2d2e76f$var$SelectOptions.setNotchWidth(notch, $643fcf18b2d2e76f$var$SelectOptions.getNotchWidth(notch));
+                const notchElement = entry.target.closest(".notched-outline")?.querySelector(".notched-outline__notch");
+                if (notchElement) $643fcf18b2d2e76f$var$SelectOptions.setNotchWidth(notchElement, $643fcf18b2d2e76f$var$SelectOptions.getNotchWidth(entry.target));
             });
         });
     }
@@ -26,8 +26,8 @@ class $643fcf18b2d2e76f$var$SelectOptions {
             });
             const lastNotch = this.notches.at(-1)?.notch;
             if (lastNotch) {
-                $643fcf18b2d2e76f$var$SelectOptions.setNotchWidth(lastNotch, $643fcf18b2d2e76f$var$SelectOptions.getNotchWidth(lastNotch));
-                this.resizeObserver.observe(notchedOutline.querySelector(".floating-label"));
+                $643fcf18b2d2e76f$var$SelectOptions.setNotchWidth(lastNotch, $643fcf18b2d2e76f$var$SelectOptions.getNotchWidth(label));
+                this.resizeObserver.observe(label);
             }
         });
     }
@@ -42,12 +42,11 @@ class $643fcf18b2d2e76f$var$SelectOptions {
         label.replaceWith(notchedOutline);
         return notchedOutline;
     }
-    static setNotchWidth(notch, width) {
-        notch.style.width = width;
+    static setNotchWidth(notchElement, width) {
+        notchElement.style.width = `${width}px`;
     }
-    static getNotchWidth(notch) {
-        const label = notch.querySelector(".floating-label");
-        return label ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px` : "auto";
+    static getNotchWidth(label) {
+        return (parseFloat(getComputedStyle(label).width) + 13) * 0.75;
     }
     setupCustomSelect(selectElement, customSelect, options) {
         const selectTrigger = customSelect.querySelector(".select-option-trigger") ?? document.createElement("div");
@@ -69,7 +68,8 @@ class $643fcf18b2d2e76f$var$SelectOptions {
         if (this.mobileMode && $643fcf18b2d2e76f$var$SelectOptions.isMobileDevice()) customSelect.classList.add("select-option--mobile");
     }
     createOptions(selectElement, selectTrigger, selectItems, options) {
-        selectItems.innerHTML = "";
+        const itemsContainer = selectItems;
+        itemsContainer.innerHTML = "";
         options.forEach((option, index)=>{
             const selectItem = document.createElement("div");
             selectItem.classList.add("select-option-list-item");
@@ -82,12 +82,13 @@ class $643fcf18b2d2e76f$var$SelectOptions {
                 if (labelValue) selectTrigger.classList.add(`select-option-trigger--${labelValue}`);
             }
             selectItem.addEventListener("click", ()=>this.selectItem(selectItem, selectTrigger, selectElement, index, selectItems));
-            selectItems.appendChild(selectItem);
+            itemsContainer.appendChild(selectItem);
         });
     }
     updateCustomSelect(selectElement, customSelect, options) {
         const selectTrigger = customSelect.querySelector(".select-option-trigger");
         const selectItems = customSelect.querySelector(".select-option-list");
+        if (!selectTrigger || !selectItems) return;
         const { selectedIndex: selectedIndex } = selectElement;
         const selectedOption = options[selectedIndex];
         const labelValue = selectedOption.getAttribute("label");
@@ -148,6 +149,13 @@ class $643fcf18b2d2e76f$var$SelectOptions {
         customSelect.classList.toggle("select-option--labeled", hasLabel);
         customSelect.classList.toggle("select-option--unlabeled", !hasLabel);
         customSelect.classList.toggle("select-option--selected", hasLabel && selectElement.selectedIndex > 0);
+    }
+    updateSelects() {
+        this.selectContainer.forEach((selectElement)=>{
+            const customSelect = selectElement.closest(".select-option-container")?.querySelector(".select-option");
+            const options = Array.from(selectElement.options);
+            if (customSelect) this.updateCustomSelect(selectElement, customSelect, options);
+        });
     }
     async init() {
         this.notched();

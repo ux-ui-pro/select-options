@@ -1,10 +1,16 @@
 class SelectOptions {
   private selectContainer: HTMLSelectElement[] = [];
+
   private floatingLabel: HTMLElement[] = [];
+
   private notches: { container: HTMLElement, notch: HTMLElement }[] = [];
+
   private customSelects: HTMLElement[] = [];
+
   private openSelect: HTMLElement | null = null;
+
   private resizeObserver: ResizeObserver;
+
   private readonly mobileMode: boolean = false;
 
   constructor({ mobileMode = false }: { mobileMode?: boolean } = {}) {
@@ -14,9 +20,9 @@ class SelectOptions {
 
     this.resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
-        const notch = entry.target.closest('.notched-outline')?.querySelector('.notched-outline__notch') as HTMLElement | null;
+        const notchElement = entry.target.closest('.notched-outline')?.querySelector('.notched-outline__notch') as HTMLElement | null;
 
-        if (notch) SelectOptions.setNotchWidth(notch, SelectOptions.getNotchWidth(notch));
+        if (notchElement) SelectOptions.setNotchWidth(notchElement, SelectOptions.getNotchWidth(entry.target as HTMLElement));
       });
     });
   }
@@ -30,9 +36,9 @@ class SelectOptions {
       const lastNotch = this.notches.at(-1)?.notch as HTMLElement | null;
 
       if (lastNotch) {
-        SelectOptions.setNotchWidth(lastNotch, SelectOptions.getNotchWidth(lastNotch));
+        SelectOptions.setNotchWidth(lastNotch, SelectOptions.getNotchWidth(label));
 
-        this.resizeObserver.observe(notchedOutline.querySelector('.floating-label') as HTMLElement);
+        this.resizeObserver.observe(label);
       }
     });
   }
@@ -51,14 +57,12 @@ class SelectOptions {
     return notchedOutline;
   }
 
-  private static setNotchWidth(notch: HTMLElement, width: string) {
-    notch.style.width = width;
+  private static setNotchWidth(notchElement: HTMLElement, width: number) {
+    notchElement.style.width = `${width}px`;
   }
 
-  private static getNotchWidth(notch: HTMLElement): string {
-    const label = notch.querySelector('.floating-label') as HTMLElement;
-
-    return label ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px` : 'auto';
+  private static getNotchWidth(label: HTMLElement): number {
+    return (parseFloat(getComputedStyle(label).width) + 13) * 0.75;
   }
 
   private setupCustomSelect(selectElement: HTMLSelectElement, customSelect: HTMLElement, options: HTMLOptionElement[]) {
@@ -96,7 +100,9 @@ class SelectOptions {
   }
 
   private createOptions(selectElement: HTMLSelectElement, selectTrigger: HTMLElement, selectItems: HTMLElement, options: HTMLOptionElement[]) {
-    selectItems.innerHTML = '';
+    const itemsContainer = selectItems;
+
+    itemsContainer.innerHTML = '';
 
     options.forEach((option, index) => {
       const selectItem = document.createElement('div');
@@ -116,13 +122,18 @@ class SelectOptions {
       }
 
       selectItem.addEventListener('click', () => this.selectItem(selectItem, selectTrigger, selectElement, index, selectItems));
-      selectItems.appendChild(selectItem);
+      itemsContainer.appendChild(selectItem);
     });
   }
 
   private updateCustomSelect(selectElement: HTMLSelectElement, customSelect: HTMLElement, options: HTMLOptionElement[]) {
     const selectTrigger = customSelect.querySelector('.select-option-trigger') as HTMLElement;
     const selectItems = customSelect.querySelector('.select-option-list') as HTMLElement;
+
+    if (!selectTrigger || !selectItems) {
+      return;
+    }
+
     const { selectedIndex } = selectElement;
     const selectedOption = options[selectedIndex];
     const labelValue = selectedOption.getAttribute('label');
@@ -212,6 +223,17 @@ class SelectOptions {
     customSelect.classList.toggle('select-option--labeled', hasLabel);
     customSelect.classList.toggle('select-option--unlabeled', !hasLabel);
     customSelect.classList.toggle('select-option--selected', hasLabel && selectElement.selectedIndex > 0);
+  }
+
+  public updateSelects() {
+    this.selectContainer.forEach((selectElement) => {
+      const customSelect = selectElement.closest('.select-option-container')?.querySelector('.select-option') as HTMLElement;
+      const options = Array.from(selectElement.options) as HTMLOptionElement[];
+
+      if (customSelect) {
+        this.updateCustomSelect(selectElement, customSelect, options);
+      }
+    });
   }
 
   async init() {
