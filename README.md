@@ -10,7 +10,7 @@
 </div>
 
 <p align="center">SelectOptions replaces standard HTML drop-down lists with custom ones, improving their appearance and user interaction.</p>
-<p align="center"><sup>1.5kB gzipped</sup></p>
+<p align="center"><sup>1.7kB gzipped</sup></p>
 <p align="center"><a href="https://codepen.io/ux-ui/full/pomJYYr">Demo</a></p>
 <br>
 
