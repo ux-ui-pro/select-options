@@ -90,12 +90,12 @@ class $643fcf18b2d2e76f$var$SelectOptions {
             const selectItem = document.createElement("div");
             selectItem.classList.add($643fcf18b2d2e76f$var$CLASSES.selectOptionListItem);
             selectItem.textContent = option.textContent;
-            const labelValue = option.getAttribute("label");
-            if (labelValue) selectItem.classList.add(`${$643fcf18b2d2e76f$var$CLASSES.selectOptionListItem}--${labelValue}`);
+            const customValue = option.getAttribute("data-custom");
+            if (customValue) selectItem.classList.add(`${$643fcf18b2d2e76f$var$CLASSES.selectOptionListItem}--${customValue}`);
             if (option.selected) {
                 selectItem.classList.add($643fcf18b2d2e76f$var$CLASSES.selectOptionListItemSelected);
                 newSelectTrigger.textContent = option.textContent;
-                if (labelValue) newSelectTrigger.classList.add(`${$643fcf18b2d2e76f$var$CLASSES.selectOptionTrigger}--${labelValue}`);
+                if (customValue) newSelectTrigger.classList.add(`${$643fcf18b2d2e76f$var$CLASSES.selectOptionTrigger}--${customValue}`);
             }
             selectItem.addEventListener("click", ()=>this.selectItem(selectItem, newSelectTrigger, selectElement, index, newSelectItems));
             newSelectItems.appendChild(selectItem);
@@ -106,9 +106,9 @@ class $643fcf18b2d2e76f$var$SelectOptions {
         const selectItems = customSelect.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.selectOptionList}`);
         const { selectedIndex: selectedIndex } = selectElement;
         const selectedOption = options[selectedIndex];
-        const labelValue = selectedOption.getAttribute("label");
+        const customValue = selectedOption.getAttribute("data-custom");
         selectTrigger.textContent = selectedOption.textContent;
-        $643fcf18b2d2e76f$var$SelectOptions.updateClasses(selectTrigger, `${$643fcf18b2d2e76f$var$CLASSES.selectOptionTrigger}--${labelValue}`);
+        $643fcf18b2d2e76f$var$SelectOptions.updateClasses(selectTrigger, `${$643fcf18b2d2e76f$var$CLASSES.selectOptionTrigger}--${customValue}`);
         customSelect.classList.toggle($643fcf18b2d2e76f$var$CLASSES.selectOptionSelected, selectedIndex > 0);
         this.createOptions(selectElement, selectTrigger, selectItems, options);
     }

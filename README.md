@@ -28,11 +28,11 @@ import SelectOptions from 'select-options';
 ```
 <sub>CSS</sub>
 ```SCSS
-@import "select-options/dist/";
+@import "select-options/dist";
 ```
 <sub>if your bundler supports SCSS</sub>
 ```SCSS
-@import "select-options/src/";
+@import "select-options/src";
 ```
 <br>
 

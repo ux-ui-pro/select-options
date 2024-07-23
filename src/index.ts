@@ -123,15 +123,15 @@ class SelectOptions {
       selectItem.classList.add(CLASSES.selectOptionListItem);
       selectItem.textContent = option.textContent;
 
-      const labelValue = option.getAttribute('label');
+      const customValue = option.getAttribute('data-custom');
 
-      if (labelValue) selectItem.classList.add(`${CLASSES.selectOptionListItem}--${labelValue}`);
+      if (customValue) selectItem.classList.add(`${CLASSES.selectOptionListItem}--${customValue}`);
 
       if (option.selected) {
         selectItem.classList.add(CLASSES.selectOptionListItemSelected);
         newSelectTrigger.textContent = option.textContent;
 
-        if (labelValue) newSelectTrigger.classList.add(`${CLASSES.selectOptionTrigger}--${labelValue}`);
+        if (customValue) newSelectTrigger.classList.add(`${CLASSES.selectOptionTrigger}--${customValue}`);
       }
 
       selectItem.addEventListener('click', () => this.selectItem(selectItem, newSelectTrigger, selectElement, index, newSelectItems));
@@ -145,10 +145,10 @@ class SelectOptions {
     const selectItems = customSelect.querySelector(`.${CLASSES.selectOptionList}`) as HTMLElement;
     const { selectedIndex } = selectElement;
     const selectedOption = options[selectedIndex];
-    const labelValue = selectedOption.getAttribute('label');
+    const customValue = selectedOption.getAttribute('data-custom');
 
     selectTrigger.textContent = selectedOption.textContent;
-    SelectOptions.updateClasses(selectTrigger, `${CLASSES.selectOptionTrigger}--${labelValue}`);
+    SelectOptions.updateClasses(selectTrigger, `${CLASSES.selectOptionTrigger}--${customValue}`);
     customSelect.classList.toggle(CLASSES.selectOptionSelected, selectedIndex > 0);
 
     this.createOptions(selectElement, selectTrigger, selectItems, options);
