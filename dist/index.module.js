@@ -1,6 +1,6 @@
 const $643fcf18b2d2e76f$var$CLASSES = {
     selectContainer: "select-option-container",
-    select: "select-option",
+    selectOption: "select-option",
     floatingLabel: "floating-label",
     notchedOutline: "notched-outline",
     notchedOutlineNotch: "notched-outline__notch",
@@ -20,7 +20,6 @@ const $643fcf18b2d2e76f$var$CLASSES = {
 class $643fcf18b2d2e76f$var$SelectOptions {
     selectContainer = [];
     floatingLabel = [];
-    notches = [];
     customSelects = [];
     openSelect = null;
     resizeObserver;
@@ -38,12 +37,16 @@ class $643fcf18b2d2e76f$var$SelectOptions {
     }
     notched() {
         this.floatingLabel.forEach((label)=>{
-            const notchedOutline = label.closest(`.${$643fcf18b2d2e76f$var$CLASSES.notchedOutline}`) ?? $643fcf18b2d2e76f$var$SelectOptions.createNotchedOutline(label);
-            const notch = notchedOutline.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.notchedOutlineNotch}`);
-            this.notches.push({
-                container: notchedOutline.parentNode,
-                notch: notch
-            });
+            let notchedOutline = label.closest(`.${$643fcf18b2d2e76f$var$CLASSES.notchedOutline}`);
+            let notch;
+            if (!notchedOutline) {
+                notchedOutline = $643fcf18b2d2e76f$var$SelectOptions.createNotchedOutline(label);
+                notch = notchedOutline.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.notchedOutlineNotch}`);
+                label = notch.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.floatingLabel}`);
+            } else {
+                notch = notchedOutline.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.notchedOutlineNotch}`);
+                label = notch.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.floatingLabel}`);
+            }
             $643fcf18b2d2e76f$var$SelectOptions.setNotchWidth(notch, $643fcf18b2d2e76f$var$SelectOptions.getNotchWidth(notch));
             this.resizeObserver.observe(label);
         });
@@ -60,8 +63,7 @@ class $643fcf18b2d2e76f$var$SelectOptions {
         return notchedOutline;
     }
     static setNotchWidth(notchElement, width) {
-        const newNotchElement = notchElement;
-        newNotchElement.style.width = width;
+        notchElement.style.width = width;
     }
     static getNotchWidth(notch) {
         const label = notch.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.floatingLabel}`);
@@ -97,7 +99,7 @@ class $643fcf18b2d2e76f$var$SelectOptions {
                 newSelectTrigger.textContent = option.textContent;
                 if (customValue) newSelectTrigger.classList.add(`${$643fcf18b2d2e76f$var$CLASSES.selectOptionTrigger}--${customValue}`);
             }
-            selectItem.addEventListener("click", ()=>this.selectItem(selectItem, newSelectTrigger, selectElement, index, newSelectItems));
+            selectItem.addEventListener("click", ()=>this.selectItem(newSelectTrigger, selectElement, index, newSelectItems));
             newSelectItems.appendChild(selectItem);
         });
     }
@@ -112,12 +114,11 @@ class $643fcf18b2d2e76f$var$SelectOptions {
         customSelect.classList.toggle($643fcf18b2d2e76f$var$CLASSES.selectOptionSelected, selectedIndex > 0);
         this.createOptions(selectElement, selectTrigger, selectItems, options);
     }
-    selectItem(selectItem, selectTrigger, selectElement, index, selectItems) {
-        const newSelectElement = selectElement;
-        newSelectElement.selectedIndex = index;
-        newSelectElement.dispatchEvent(new Event("change"));
-        this.createOptions(newSelectElement, selectTrigger, selectItems, Array.from(newSelectElement.options));
-        this.closeDropdown(selectTrigger.closest(`.${$643fcf18b2d2e76f$var$CLASSES.select}`));
+    selectItem(selectTrigger, selectElement, index, selectItems) {
+        selectElement.selectedIndex = index;
+        selectElement.dispatchEvent(new Event("change"));
+        this.createOptions(selectElement, selectTrigger, selectItems, Array.from(selectElement.options));
+        this.closeDropdown(selectTrigger.closest(`.${$643fcf18b2d2e76f$var$CLASSES.selectOption}`));
     }
     closeDropdown(customSelect) {
         customSelect.classList.remove($643fcf18b2d2e76f$var$CLASSES.selectOptionOpened);
@@ -167,7 +168,7 @@ class $643fcf18b2d2e76f$var$SelectOptions {
     }
     updateSelects() {
         this.selectContainer.forEach((selectElement)=>{
-            const customSelect = selectElement.closest(`.${$643fcf18b2d2e76f$var$CLASSES.selectContainer}`)?.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.select}`);
+            const customSelect = selectElement.closest(`.${$643fcf18b2d2e76f$var$CLASSES.selectContainer}`)?.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.selectOption}`);
             const options = Array.from(selectElement.options);
             if (customSelect) this.updateCustomSelect(selectElement, customSelect, options);
         });
@@ -175,14 +176,14 @@ class $643fcf18b2d2e76f$var$SelectOptions {
     async init() {
         this.notched();
         this.selectContainer.forEach((selectElement)=>{
-            const customSelect = selectElement.closest(`.${$643fcf18b2d2e76f$var$CLASSES.selectContainer}`)?.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.select}`);
+            const customSelect = selectElement.closest(`.${$643fcf18b2d2e76f$var$CLASSES.selectContainer}`)?.querySelector(`.${$643fcf18b2d2e76f$var$CLASSES.selectOption}`);
             const options = Array.from(selectElement.options);
             if (customSelect) {
                 this.setupCustomSelect(selectElement, customSelect, options);
                 $643fcf18b2d2e76f$var$SelectOptions.checkAndSetDownstairsClass(customSelect);
             }
         });
-        document.addEventListener("click", this.closeOpenedDropdowns.bind(this));
+        document.addEventListener("pointerdown", this.closeOpenedDropdowns.bind(this));
         window.addEventListener("resize", this.handleResize.bind(this));
         window.addEventListener("scroll", this.handleResize.bind(this));
     }

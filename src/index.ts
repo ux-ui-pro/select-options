@@ -1,6 +1,6 @@
 const CLASSES = {
   selectContainer: 'select-option-container',
-  select: 'select-option',
+  selectOption: 'select-option',
   floatingLabel: 'floating-label',
   notchedOutline: 'notched-outline',
   notchedOutlineNotch: 'notched-outline__notch',
@@ -23,8 +23,6 @@ class SelectOptions {
 
   private floatingLabel: HTMLElement[] = [];
 
-  private notches: { container: HTMLElement, notch: HTMLElement }[] = [];
-
   private customSelects: HTMLElement[] = [];
 
   private openSelect: HTMLElement | null = null;
@@ -35,23 +33,49 @@ class SelectOptions {
 
   constructor({ mobileMode = false }: { mobileMode?: boolean } = {}) {
     this.mobileMode = mobileMode;
-    this.selectContainer = Array.from(document.querySelectorAll(`.${CLASSES.selectContainer} select`));
-    this.floatingLabel = Array.from(document.querySelectorAll(`.${CLASSES.floatingLabel}`));
+    this.selectContainer = Array.from(
+      document.querySelectorAll(`.${CLASSES.selectContainer} select`),
+    );
+    this.floatingLabel = Array.from(
+      document.querySelectorAll(`.${CLASSES.floatingLabel}`),
+    );
     this.resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
-        const notchElement = entry.target.closest(`.${CLASSES.notchedOutline}`)?.querySelector(`.${CLASSES.notchedOutlineNotch}`) as HTMLElement | null;
+        const notchElement = entry.target
+          .closest(`.${CLASSES.notchedOutline}`)
+          ?.querySelector(
+            `.${CLASSES.notchedOutlineNotch}`,
+          ) as HTMLElement | null;
 
-        if (notchElement) SelectOptions.setNotchWidth(notchElement, SelectOptions.getNotchWidth(notchElement));
+        if (notchElement) {
+          SelectOptions.setNotchWidth(
+            notchElement,
+            SelectOptions.getNotchWidth(notchElement),
+          );
+        }
       });
     });
   }
 
   private notched() {
     this.floatingLabel.forEach((label) => {
-      const notchedOutline = label.closest(`.${CLASSES.notchedOutline}`) ?? SelectOptions.createNotchedOutline(label);
-      const notch = notchedOutline.querySelector(`.${CLASSES.notchedOutlineNotch}`) as HTMLElement;
+      let notchedOutline = label.closest(`.${CLASSES.notchedOutline}`);
+      let notch: HTMLElement;
 
-      this.notches.push({ container: notchedOutline.parentNode as HTMLElement, notch });
+      if (!notchedOutline) {
+        notchedOutline = SelectOptions.createNotchedOutline(label);
+        notch = notchedOutline.querySelector(
+          `.${CLASSES.notchedOutlineNotch}`,
+        ) as HTMLElement;
+
+        label = notch.querySelector(`.${CLASSES.floatingLabel}`) as HTMLElement;
+      } else {
+        notch = notchedOutline.querySelector(
+          `.${CLASSES.notchedOutlineNotch}`,
+        ) as HTMLElement;
+
+        label = notch.querySelector(`.${CLASSES.floatingLabel}`) as HTMLElement;
+      }
 
       SelectOptions.setNotchWidth(notch, SelectOptions.getNotchWidth(notch));
 
@@ -75,26 +99,37 @@ class SelectOptions {
   }
 
   private static setNotchWidth(notchElement: HTMLElement, width: string) {
-    const newNotchElement = notchElement;
-
-    newNotchElement.style.width = width;
+    notchElement.style.width = width;
   }
 
   private static getNotchWidth(notch: HTMLElement): string {
     const label = notch.querySelector(`.${CLASSES.floatingLabel}`) as HTMLElement;
 
-    return label ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px` : 'auto';
+    return label
+      ? `${(parseFloat(getComputedStyle(label).width) + 13) * 0.75}px`
+      : 'auto';
   }
 
-  private setupCustomSelect(selectElement: HTMLSelectElement, customSelect: HTMLElement, options: HTMLOptionElement[]) {
-    const selectTrigger = customSelect.querySelector(`.${CLASSES.selectOptionTrigger}`) || document.createElement('div');
-    const selectItems = customSelect.querySelector(`.${CLASSES.selectOptionList}`) || document.createElement('div');
+  private setupCustomSelect(
+    selectElement: HTMLSelectElement,
+    customSelect: HTMLElement,
+    options: HTMLOptionElement[],
+  ) {
+    const selectTrigger = customSelect.querySelector(`.${CLASSES.selectOptionTrigger}`)
+      || document.createElement('div');
+    const selectItems = customSelect.querySelector(`.${CLASSES.selectOptionList}`)
+      || document.createElement('div');
 
     selectTrigger.classList.add(CLASSES.selectOptionTrigger);
     selectItems.classList.add(CLASSES.selectOptionList);
     customSelect.append(selectTrigger, selectItems);
 
-    this.createOptions(selectElement, selectTrigger as HTMLElement, selectItems as HTMLElement, options);
+    this.createOptions(
+      selectElement,
+        selectTrigger as HTMLElement,
+        selectItems as HTMLElement,
+        options,
+    );
 
     selectTrigger.addEventListener('click', (e) => this.toggleDropdown(e, customSelect));
 
@@ -111,7 +146,12 @@ class SelectOptions {
     }
   }
 
-  private createOptions(selectElement: HTMLSelectElement, selectTrigger: HTMLElement, selectItems: HTMLElement, options: HTMLOptionElement[]) {
+  private createOptions(
+    selectElement: HTMLSelectElement,
+    selectTrigger: HTMLElement,
+    selectItems: HTMLElement,
+    options: HTMLOptionElement[],
+  ) {
     const newSelectTrigger = selectTrigger;
     const newSelectItems = selectItems;
 
@@ -125,43 +165,82 @@ class SelectOptions {
 
       const customValue = option.getAttribute('data-custom');
 
-      if (customValue) selectItem.classList.add(`${CLASSES.selectOptionListItem}--${customValue}`);
+      if (customValue) {
+        selectItem.classList.add(
+          `${CLASSES.selectOptionListItem}--${customValue}`,
+        );
+      }
 
       if (option.selected) {
         selectItem.classList.add(CLASSES.selectOptionListItemSelected);
         newSelectTrigger.textContent = option.textContent;
 
-        if (customValue) newSelectTrigger.classList.add(`${CLASSES.selectOptionTrigger}--${customValue}`);
+        if (customValue) {
+          newSelectTrigger.classList.add(
+            `${CLASSES.selectOptionTrigger}--${customValue}`,
+          );
+        }
       }
 
-      selectItem.addEventListener('click', () => this.selectItem(selectItem, newSelectTrigger, selectElement, index, newSelectItems));
+      selectItem.addEventListener('click', () => this.selectItem(
+        newSelectTrigger as HTMLElement,
+        selectElement,
+        index,
+        newSelectItems,
+      ));
 
       newSelectItems.appendChild(selectItem);
     });
   }
 
-  private updateCustomSelect(selectElement: HTMLSelectElement, customSelect: HTMLElement, options: HTMLOptionElement[]) {
-    const selectTrigger = customSelect.querySelector(`.${CLASSES.selectOptionTrigger}`) as HTMLElement;
-    const selectItems = customSelect.querySelector(`.${CLASSES.selectOptionList}`) as HTMLElement;
+  private updateCustomSelect(
+    selectElement: HTMLSelectElement,
+    customSelect: HTMLElement,
+    options: HTMLOptionElement[],
+  ) {
+    const selectTrigger = customSelect.querySelector(
+      `.${CLASSES.selectOptionTrigger}`,
+    ) as HTMLElement;
+    const selectItems = customSelect.querySelector(
+      `.${CLASSES.selectOptionList}`,
+    ) as HTMLElement;
     const { selectedIndex } = selectElement;
     const selectedOption = options[selectedIndex];
     const customValue = selectedOption.getAttribute('data-custom');
 
     selectTrigger.textContent = selectedOption.textContent;
-    SelectOptions.updateClasses(selectTrigger, `${CLASSES.selectOptionTrigger}--${customValue}`);
-    customSelect.classList.toggle(CLASSES.selectOptionSelected, selectedIndex > 0);
+
+    SelectOptions.updateClasses(
+      selectTrigger,
+      `${CLASSES.selectOptionTrigger}--${customValue}`,
+    );
+
+    customSelect.classList.toggle(
+      CLASSES.selectOptionSelected,
+      selectedIndex > 0,
+    );
 
     this.createOptions(selectElement, selectTrigger, selectItems, options);
   }
 
-  private selectItem(selectItem: HTMLElement, selectTrigger: HTMLElement, selectElement: HTMLSelectElement, index: number, selectItems: HTMLElement) {
-    const newSelectElement = selectElement;
+  private selectItem(
+    selectTrigger: HTMLElement,
+    selectElement: HTMLSelectElement,
+    index: number,
+    selectItems: HTMLElement,
+  ) {
+    selectElement.selectedIndex = index;
+    selectElement.dispatchEvent(new Event('change'));
 
-    newSelectElement.selectedIndex = index;
-    newSelectElement.dispatchEvent(new Event('change'));
-
-    this.createOptions(newSelectElement, selectTrigger, selectItems, Array.from(newSelectElement.options) as HTMLOptionElement[]);
-    this.closeDropdown(selectTrigger.closest(`.${CLASSES.select}`) as HTMLElement);
+    this.createOptions(
+      selectElement,
+      selectTrigger,
+      selectItems,
+        Array.from(selectElement.options) as HTMLOptionElement[],
+    );
+    this.closeDropdown(
+        selectTrigger.closest(`.${CLASSES.selectOption}`) as HTMLElement,
+    );
   }
 
   private closeDropdown(customSelect: HTMLElement) {
@@ -180,7 +259,9 @@ class SelectOptions {
 
   private closeOpenedDropdowns(e?: MouseEvent) {
     this.customSelects.forEach((dropdown) => {
-      if (!e || !dropdown.contains(e.target as Node)) dropdown.classList.remove(CLASSES.selectOptionOpened);
+      if (!e || !dropdown.contains(e.target as Node)) {
+        dropdown.classList.remove(CLASSES.selectOptionOpened);
+      }
     });
 
     this.openSelect = null;
@@ -199,7 +280,10 @@ class SelectOptions {
   private static checkAndSetDownstairsClass(customSelect: HTMLElement) {
     const rect = customSelect.getBoundingClientRect();
 
-    customSelect.classList.toggle(CLASSES.selectOptionDownstairs, rect.bottom + 160 > window.innerHeight);
+    customSelect.classList.toggle(
+      CLASSES.selectOptionDownstairs,
+      rect.bottom + 160 > window.innerHeight,
+    );
   }
 
   private handleResize() {
@@ -207,34 +291,52 @@ class SelectOptions {
   }
 
   private static isMobileOS(): boolean {
-    return (/android/i.test(navigator.userAgent || navigator.vendor)) || ((/iPad|iPhone|iPod/.test(navigator.userAgent || navigator.vendor)) && !('MSStream' in window));
+    return (
+      /android/i.test(navigator.userAgent || navigator.vendor)
+        || (/iPad|iPhone|iPod/.test(navigator.userAgent || navigator.vendor)
+          && !('MSStream' in window))
+    );
   }
 
   private static isTouchDevice(): boolean {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    return (
+      'ontouchstart' in window
+        || navigator.maxTouchPoints > 0
+        || window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    );
   }
 
   private static isMobileDevice(): boolean {
     return SelectOptions.isTouchDevice() || SelectOptions.isMobileOS();
   }
 
-  private static updateCustomSelectState(customSelect: HTMLElement, selectElement: HTMLSelectElement) {
+  private static updateCustomSelectState(
+    customSelect: HTMLElement,
+    selectElement: HTMLSelectElement,
+  ) {
     const hasLabel = customSelect.querySelector(`label.${CLASSES.floatingLabel}`) !== null;
 
     customSelect.classList.toggle(CLASSES.selectOptionLabeled, hasLabel);
     customSelect.classList.toggle(CLASSES.selectOptionUnlabeled, !hasLabel);
-    customSelect.classList.toggle(CLASSES.selectOptionSelected, hasLabel && selectElement.selectedIndex > 0);
+    customSelect.classList.toggle(
+      CLASSES.selectOptionSelected,
+      hasLabel && selectElement.selectedIndex > 0,
+    );
   }
 
   private static updateClasses(element: HTMLElement, className: string) {
-    element.classList.remove(...Array.from(element.classList).filter((cls) => cls.startsWith(`${CLASSES.selectOptionTrigger}--`)));
+    element.classList.remove(
+      ...Array.from(element.classList).filter((cls) => cls.startsWith(`${CLASSES.selectOptionTrigger}--`)),
+    );
 
     if (className) element.classList.add(className);
   }
 
   public updateSelects() {
     this.selectContainer.forEach((selectElement) => {
-      const customSelect = selectElement.closest(`.${CLASSES.selectContainer}`)?.querySelector(`.${CLASSES.select}`) as HTMLElement;
+      const customSelect = selectElement
+        .closest(`.${CLASSES.selectContainer}`)
+        ?.querySelector(`.${CLASSES.selectOption}`) as HTMLElement;
       const options = Array.from(selectElement.options) as HTMLOptionElement[];
 
       if (customSelect) {
@@ -247,7 +349,9 @@ class SelectOptions {
     this.notched();
 
     this.selectContainer.forEach((selectElement) => {
-      const customSelect = selectElement.closest(`.${CLASSES.selectContainer}`)?.querySelector(`.${CLASSES.select}`) as HTMLElement;
+      const customSelect = selectElement
+        .closest(`.${CLASSES.selectContainer}`)
+        ?.querySelector(`.${CLASSES.selectOption}`) as HTMLElement;
       const options = Array.from(selectElement.options) as HTMLOptionElement[];
 
       if (customSelect) {
@@ -257,7 +361,8 @@ class SelectOptions {
       }
     });
 
-    document.addEventListener('click', this.closeOpenedDropdowns.bind(this));
+    document.addEventListener('pointerdown', this.closeOpenedDropdowns.bind(this));
+
     window.addEventListener('resize', this.handleResize.bind(this));
     window.addEventListener('scroll', this.handleResize.bind(this));
   }

@@ -12,7 +12,7 @@ $parcel$defineInteropFlag(module.exports);
 $parcel$export(module.exports, "default", function () { return $a196c1ed25598f0e$export$2e2bcd8739ae039; });
 const $a196c1ed25598f0e$var$CLASSES = {
     selectContainer: "select-option-container",
-    select: "select-option",
+    selectOption: "select-option",
     floatingLabel: "floating-label",
     notchedOutline: "notched-outline",
     notchedOutlineNotch: "notched-outline__notch",
@@ -32,7 +32,6 @@ const $a196c1ed25598f0e$var$CLASSES = {
 class $a196c1ed25598f0e$var$SelectOptions {
     selectContainer = [];
     floatingLabel = [];
-    notches = [];
     customSelects = [];
     openSelect = null;
     resizeObserver;
@@ -50,12 +49,16 @@ class $a196c1ed25598f0e$var$SelectOptions {
     }
     notched() {
         this.floatingLabel.forEach((label)=>{
-            const notchedOutline = label.closest(`.${$a196c1ed25598f0e$var$CLASSES.notchedOutline}`) ?? $a196c1ed25598f0e$var$SelectOptions.createNotchedOutline(label);
-            const notch = notchedOutline.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.notchedOutlineNotch}`);
-            this.notches.push({
-                container: notchedOutline.parentNode,
-                notch: notch
-            });
+            let notchedOutline = label.closest(`.${$a196c1ed25598f0e$var$CLASSES.notchedOutline}`);
+            let notch;
+            if (!notchedOutline) {
+                notchedOutline = $a196c1ed25598f0e$var$SelectOptions.createNotchedOutline(label);
+                notch = notchedOutline.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.notchedOutlineNotch}`);
+                label = notch.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.floatingLabel}`);
+            } else {
+                notch = notchedOutline.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.notchedOutlineNotch}`);
+                label = notch.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.floatingLabel}`);
+            }
             $a196c1ed25598f0e$var$SelectOptions.setNotchWidth(notch, $a196c1ed25598f0e$var$SelectOptions.getNotchWidth(notch));
             this.resizeObserver.observe(label);
         });
@@ -72,8 +75,7 @@ class $a196c1ed25598f0e$var$SelectOptions {
         return notchedOutline;
     }
     static setNotchWidth(notchElement, width) {
-        const newNotchElement = notchElement;
-        newNotchElement.style.width = width;
+        notchElement.style.width = width;
     }
     static getNotchWidth(notch) {
         const label = notch.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.floatingLabel}`);
@@ -109,7 +111,7 @@ class $a196c1ed25598f0e$var$SelectOptions {
                 newSelectTrigger.textContent = option.textContent;
                 if (customValue) newSelectTrigger.classList.add(`${$a196c1ed25598f0e$var$CLASSES.selectOptionTrigger}--${customValue}`);
             }
-            selectItem.addEventListener("click", ()=>this.selectItem(selectItem, newSelectTrigger, selectElement, index, newSelectItems));
+            selectItem.addEventListener("click", ()=>this.selectItem(newSelectTrigger, selectElement, index, newSelectItems));
             newSelectItems.appendChild(selectItem);
         });
     }
@@ -124,12 +126,11 @@ class $a196c1ed25598f0e$var$SelectOptions {
         customSelect.classList.toggle($a196c1ed25598f0e$var$CLASSES.selectOptionSelected, selectedIndex > 0);
         this.createOptions(selectElement, selectTrigger, selectItems, options);
     }
-    selectItem(selectItem, selectTrigger, selectElement, index, selectItems) {
-        const newSelectElement = selectElement;
-        newSelectElement.selectedIndex = index;
-        newSelectElement.dispatchEvent(new Event("change"));
-        this.createOptions(newSelectElement, selectTrigger, selectItems, Array.from(newSelectElement.options));
-        this.closeDropdown(selectTrigger.closest(`.${$a196c1ed25598f0e$var$CLASSES.select}`));
+    selectItem(selectTrigger, selectElement, index, selectItems) {
+        selectElement.selectedIndex = index;
+        selectElement.dispatchEvent(new Event("change"));
+        this.createOptions(selectElement, selectTrigger, selectItems, Array.from(selectElement.options));
+        this.closeDropdown(selectTrigger.closest(`.${$a196c1ed25598f0e$var$CLASSES.selectOption}`));
     }
     closeDropdown(customSelect) {
         customSelect.classList.remove($a196c1ed25598f0e$var$CLASSES.selectOptionOpened);
@@ -179,7 +180,7 @@ class $a196c1ed25598f0e$var$SelectOptions {
     }
     updateSelects() {
         this.selectContainer.forEach((selectElement)=>{
-            const customSelect = selectElement.closest(`.${$a196c1ed25598f0e$var$CLASSES.selectContainer}`)?.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.select}`);
+            const customSelect = selectElement.closest(`.${$a196c1ed25598f0e$var$CLASSES.selectContainer}`)?.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.selectOption}`);
             const options = Array.from(selectElement.options);
             if (customSelect) this.updateCustomSelect(selectElement, customSelect, options);
         });
@@ -187,14 +188,14 @@ class $a196c1ed25598f0e$var$SelectOptions {
     async init() {
         this.notched();
         this.selectContainer.forEach((selectElement)=>{
-            const customSelect = selectElement.closest(`.${$a196c1ed25598f0e$var$CLASSES.selectContainer}`)?.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.select}`);
+            const customSelect = selectElement.closest(`.${$a196c1ed25598f0e$var$CLASSES.selectContainer}`)?.querySelector(`.${$a196c1ed25598f0e$var$CLASSES.selectOption}`);
             const options = Array.from(selectElement.options);
             if (customSelect) {
                 this.setupCustomSelect(selectElement, customSelect, options);
                 $a196c1ed25598f0e$var$SelectOptions.checkAndSetDownstairsClass(customSelect);
             }
         });
-        document.addEventListener("click", this.closeOpenedDropdowns.bind(this));
+        document.addEventListener("pointerdown", this.closeOpenedDropdowns.bind(this));
         window.addEventListener("resize", this.handleResize.bind(this));
         window.addEventListener("scroll", this.handleResize.bind(this));
     }
